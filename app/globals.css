@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+/* 다크모드: data-theme로 토글, 없으면 시스템 설정 따름 */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:not([data-theme] *)) {
+      @slot;
+    }
+  }
+}
+
+/* Design System */
+:root {
+  --background: #FFFFFF;
+  --subtle-gray: #EFEFF1;
+  --border: #E5E7EB;
+  --text-primary: #0F111D;
+  --text-secondary: #6B7280;
+  --accent: #6D5EF3;
+  --icon: #5C6271;
+  --main-bg: #FFFFFF;
+  --sidebar-bg: #FFFFFF;
+  --pill-bg: #EFEFF1;
+  --sidebar-hover: #F6F8FB;
+}
+
+[data-theme="dark"] {
+  --background: #0f0f10;
+  --subtle-gray: #27272a;
+  --border: #3f3f46;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --accent: #8b7cf7;
+  --icon: #a1a1aa;
+  --main-bg: #0f0f10;
+  --sidebar-bg: #18181b;
+  --pill-bg: #27272a;
+  --sidebar-hover: #27272a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --font-sans: "Apple SD Gothic Neo", var(--font-noto-sans-kr), sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --background: #0f0f10;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: "Apple SD Gothic Neo", var(--font-noto-sans-kr), sans-serif;
+}
+
+/* 입력창 그라데이션 테두리 (보라-파랑 → 오렌지-레드, 은은한 글로우) */
+.input-border-gradient {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 2px;
+  background: linear-gradient(135deg, #8b7cf7 0%, #6D5EF3 25%, #6366f1 50%, #a78bfa 75%, #f97316 100%);
+  box-shadow: 0 0 20px -4px rgba(109, 94, 243, 0.25), 0 0 12px -4px rgba(249, 115, 22, 0.15);
+}
+
+.input-border-gradient-inner {
+  border-radius: calc(1.25rem - 2px);
+  background: var(--background);
+}
+
+/* Hero 블롭 회전 */
+@keyframes hero-blob-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.hero-blob-rotate {
+  animation: hero-blob-rotate 20s linear infinite;
+}
+
+/* 초기 등장 스태거 (미세한 시간차) */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-1 { animation: fade-in-up 0.4s ease-out forwards; }
+.stagger-2 { animation: fade-in-up 0.4s ease-out 0.06s forwards; opacity: 0; }
+.stagger-3 { animation: fade-in-up 0.4s ease-out 0.12s forwards; opacity: 0; }
+.stagger-4 { animation: fade-in-up 0.4s ease-out 0.18s forwards; opacity: 0; }
+.stagger-5 { animation: fade-in-up 0.4s ease-out 0.24s forwards; opacity: 0; }
+
+/* Hero 인사 문구 그라데이션 (서버/클라이언트 동일) */
+.text-hero-gradient {
+  background: linear-gradient(90deg, #D349FA 0%, #6E3CD0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 프로젝트 카드 스크롤바 숨김 */
+.project-scroll::-webkit-scrollbar {
+  display: none;
+}
+.project-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
