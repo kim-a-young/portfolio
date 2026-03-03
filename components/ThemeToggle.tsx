@@ -1,9 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "./ThemeProvider";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 서버와 클라이언트 초기 렌더링 불일치를 막기 위해
+  // 클라이언트 마운트 전에는 토글을 렌더링하지 않음
+  if (!mounted) {
+    return null;
+  }
 
   const toggle = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");

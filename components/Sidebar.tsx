@@ -9,6 +9,7 @@ interface SidebarProps {
   onNewChat: () => void;
   onSelectChat: (chatId: string) => void;
   onSelectProject: (projectId: string) => void;
+  onGoHome: () => void;
   chatHistory: ChatHistory[];
   currentChatId: string | null;
   selectedProject: string | null;
@@ -27,6 +28,24 @@ function CloseIcon({ className }: { className?: string }) {
   return (
     <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+function HomeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden
+    >
+      <path d="M3 11.5L12 4l9 7.5" />
+      <path d="M5 10.5V20h14v-9.5" />
     </svg>
   );
 }
@@ -54,6 +73,7 @@ export function Sidebar({
   onNewChat,
   onSelectChat,
   onSelectProject,
+  onGoHome,
   chatHistory,
   currentChatId,
   selectedProject,
@@ -80,10 +100,16 @@ export function Sidebar({
         style={{ borderColor: "var(--border)" }}
         aria-label="사이드바"
       >
-        <div className="flex items-center gap-2 border-b p-3" style={{ borderColor: "var(--border)" }}>
-          <h2 className="min-w-0 flex-1 truncate text-base font-semibold" style={{ color: "var(--text-primary)" }}>
-            아영님 소개
-          </h2>
+        <div className="flex items-center justify-between gap-2 border-b px-2 py-2" style={{ borderColor: "var(--border)" }}>
+          <button
+            type="button"
+            onClick={onGoHome}
+            className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-[var(--sidebar-hover)]"
+            style={{ color: "var(--icon)" }}
+            aria-label="홈으로 이동"
+          >
+            <HomeIcon className="h-5 w-5" />
+          </button>
           <button
             type="button"
             onClick={onClose}
