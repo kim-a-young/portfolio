@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 interface ProjectViewProps {
   projectId: string;
+  sidebarOpen?: boolean;
 }
 
 type ProjectItem = {
@@ -22,9 +23,10 @@ const PROJECTS: ProjectItem[] = [
     id: 1,
     name: "항공정보포털 UI/UX 개편",
     url: "#",
-    image: "/images/happyhabit.png",
+    image: "/images/pf_airportal_m.png",
     accent: "#0369a1", // 딥 블루
     meta: "웹 · 공공서비스",
+    detailImage: "/images/pf_airportal.png",
   },
   {
     id: 2,
@@ -39,7 +41,7 @@ const PROJECTS: ProjectItem[] = [
     id: 3,
     name: "레드커넥트 앱 고도화",
     url: "#",
-    image: "/images/redconnect-default.png",
+    image: "/images/pf_redconnect_m.png",
     accent: "#dc2626", // 레드
     meta: "앱 · 고도화",
   },
@@ -47,7 +49,7 @@ const PROJECTS: ProjectItem[] = [
     id: 4,
     name: "헤르지온 앱 구축",
     url: "#",
-    image: "/images/herzion.png",
+    image: "/images/pf_herzion_m.png",
     accent: "#4f46e5", // 보라/블루
     meta: "앱 · 구축",
   },
@@ -55,7 +57,7 @@ const PROJECTS: ProjectItem[] = [
     id: 5,
     name: "구루핀월렛 앱 UI 리뉴얼",
     url: "#",
-    image: "/images/happyhabit.png",
+    image: "/images/pf_gurufin_m.png",
     accent: "#1d4ed8", // 블루
     meta: "앱 · 금융",
   },
@@ -63,31 +65,31 @@ const PROJECTS: ProjectItem[] = [
     id: 6,
     name: "KB손해보험 전채널 서비스 운영",
     url: "#",
-    image: "/images/happyhabit.png",
-    accent: "#b45309", // 브라운/골드
+    image: "/images/pf_kb_m.png",
+    accent: "#f97316", // 이미지 계열에 맞춘 오렌지 톤
     meta: "웹 · 금융",
   },
   {
     id: 7,
     name: "헤이폴 앱 구축",
     url: "#",
-    image: "/images/happyhabit.png",
-    accent: "#22c55e", // 그린
+    image: "/images/pf_heypoll_m.png",
+    accent: "#C52AD9", // 보라/핑크 계열 고정 컬러
     meta: "앱 · 구축",
   },
   {
     id: 8,
-    name: "OLED Space 모바일 구축",
+    name: "LG OLED SPACE 사이트 구축",
     url: "#",
-    image: "/images/happyhabit.png",
-    accent: "#047857", // 그린
+    image: "/images/pf_oled_m.png",
+    accent: "#BE1441", // 고정 배경 컬러
     meta: "모바일 · 전시",
   },
   {
     id: 9,
     name: "정관장몰 상세페이지 UI/UX 개선",
     url: "#",
-    image: "/images/happyhabit.png",
+    image: "/images/pf_kgcshop_m.png",
     accent: "#b91c1c", // 레드 계열
     meta: "웹 · 커머스",
   },
@@ -95,15 +97,15 @@ const PROJECTS: ProjectItem[] = [
     id: 10,
     name: "영진전문대학 & 입학처 사이트 구축",
     url: "#",
-    image: "/images/happyhabit.png",
-    accent: "#0f172a", // 남색
+    image: "/images/pf_yju_m.png",
+    accent: "#007fa0", // 대학 마크 컬러
     meta: "웹 · 교육",
   },
   {
     id: 11,
     name: "전통시장화재공제 사이트 구축",
     url: "#",
-    image: "/images/happyhabit.png",
+    image: "/images/pf_semas_m.png",
     accent: "#ea580c", // 오렌지
     meta: "웹 · 공공서비스",
   },
@@ -159,7 +161,7 @@ const PROJECTS: ProjectItem[] = [
     id: 18,
     name: "풀무원 아미오 사이트 구축",
     url: "#",
-    image: "/images/happyhabit.png",
+    image: "/images/pf_amio_m.png",
     accent: "#16a34a", // 그린
     meta: "웹 · 커머스",
   },
@@ -173,7 +175,7 @@ const PROJECTS: ProjectItem[] = [
   },
 ];
 
-export function ProjectView({ projectId }: ProjectViewProps) {
+export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps) {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [projectId]);
@@ -181,6 +183,14 @@ export function ProjectView({ projectId }: ProjectViewProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [openProject, setOpenProject] = useState<ProjectItem | null>(null);
   const [imageColors, setImageColors] = useState<Record<number, string>>({});
+  const [cacheBust] = useState(() => Date.now());
+  const modalScrollRef = useRef<HTMLDivElement | null>(null);
+  const [imageOrientation, setImageOrientation] = useState<
+    Record<number, "landscape" | "portrait" | "square">
+  >({});
+
+  // 이미지 로드 전 fallback: 가로형으로 알려진 프로젝트 (orientation 설정되면 실제 비율 사용)
+  const LANDSCAPE_PROJECT_IDS = [4, 6, 8, 9, 10, 11];
 
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
@@ -203,14 +213,25 @@ export function ProjectView({ projectId }: ProjectViewProps) {
     if (typeof window === "undefined") return;
 
     PROJECTS.forEach((project) => {
-      // 이미 계산된 색상은 건너뜀
-      if (imageColors[project.id]) return;
-
       const img = new window.Image();
-      img.src = project.image;
+      img.src = `${project.image}?v=${cacheBust}`;
 
       img.onload = () => {
         try {
+          // 가로/세로 비율 계산
+          const { naturalWidth, naturalHeight } = img;
+          const orientation: "landscape" | "portrait" | "square" =
+            naturalWidth > naturalHeight
+              ? "landscape"
+              : naturalWidth < naturalHeight
+              ? "portrait"
+              : "square";
+
+          setImageOrientation((prev) => ({
+            ...prev,
+            [project.id]: orientation,
+          }));
+
           const canvas = document.createElement("canvas");
           const context = canvas.getContext("2d");
           if (!context) return;
@@ -243,8 +264,9 @@ export function ProjectView({ projectId }: ProjectViewProps) {
             const l = (max + min) / 2;
             const s = max === min ? 0 : (l > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min));
 
-            // 너무 어둡거나 밝은 영역은 제외하고, 채도가 높은 픽셀을 우선
-            if (l < 0.18 || l > 0.85 || s < 0.25) continue;
+            // 너무 어둡거나 밝은 영역은 제외하고, 채도가 어느 정도 있는 픽셀을 우선
+            // (정관장처럼 채도가 상대적으로 낮은 컬러도 잡아주기 위해 s 임계값을 0.15로 완화)
+            if (l < 0.18 || l > 0.85 || s < 0.15) continue;
 
             const score = s * (1 - Math.abs(l - 0.55)); // 채도 + 중간 밝기 우선
             if (score > bestScore) {
@@ -282,7 +304,11 @@ export function ProjectView({ projectId }: ProjectViewProps) {
 
           setImageColors((prev) => ({
             ...prev,
-            [project.id]: color,
+            [project.id]:
+              // 특정 프로젝트는 지정 색상(accent)으로 고정
+              project.id === 7 || project.id === 8 || project.id === 10
+                ? project.accent
+                : color,
           }));
         } catch {
           // 캔버스 접근이 막힌 경우에는 accent 값으로 폴백
@@ -293,7 +319,7 @@ export function ProjectView({ projectId }: ProjectViewProps) {
         }
       };
     });
-  }, [imageColors]);
+  }, [cacheBust]);
 
   const activeProject =
     hoveredId != null
@@ -304,7 +330,10 @@ export function ProjectView({ projectId }: ProjectViewProps) {
 
   const activeAccent =
     hasHover && activeProject
-      ? imageColors[hoveredId!] ?? activeProject.accent
+      ? // 헤이폴, LG OLED, 영진전문대 프로젝트는 항상 고정 색상 사용
+        activeProject.id === 7 || activeProject.id === 8 || activeProject.id === 10
+        ? activeProject.accent
+        : imageColors[hoveredId!] ?? activeProject.accent
       : "#ffffff";
 
   return (
@@ -312,25 +341,35 @@ export function ProjectView({ projectId }: ProjectViewProps) {
       className="relative min-h-screen text-black transition-colors duration-700"
       style={{ backgroundColor: activeAccent }}
     >
-      {/* 배경 이미지 레이어 */}
-      <div className="pointer-events-none fixed inset-0 flex items-center justify-center">
+      {/* 배경 이미지 레이어 - 사이드바 열림 시 가시 영역 기준 센터 */}
+      <div
+        className={`pointer-events-none fixed flex items-center justify-center transition-[left] duration-200 ${
+          sidebarOpen ? "top-0 right-0 bottom-0 left-0 md:left-[260px]" : "inset-0"
+        }`}
+      >
         {PROJECTS.map((project) => {
           const isActive = hoveredId != null && project.id === hoveredId;
+
+          // 이미지 실제 비율로 자동: 가로 0.5, 세로 0.35. 로드 전에는 LANDSCAPE_PROJECT_IDS면 0.5
+          const orientation = imageOrientation[project.id];
+          const isLandscape =
+            orientation === "landscape" ||
+            (orientation == null && LANDSCAPE_PROJECT_IDS.includes(project.id));
+          const scale = isLandscape ? 0.5 : 0.35;
+
           return (
             <div
               key={project.id}
-              className={`absolute transition-all duration-700 ease-out ${
+              className={`absolute flex max-h-[80vh] max-w-[90vw] items-center justify-center transition-all duration-700 ease-out ${
                 isActive ? "opacity-100 scale-100" : "opacity-0 scale-95"
               }`}
             >
-              <Image
-                src={project.image}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`${project.image}?v=${cacheBust}`}
                 alt={project.name}
-                width={1600}
-                height={900}
-                className="h-auto max-h-[80vh] w-auto object-contain"
-                sizes="80vw"
-                priority={project.id === 1}
+                className="max-h-full max-w-full w-auto h-auto object-scale-down origin-center"
+                style={{ transform: `scale(${scale})` }}
               />
             </div>
           );
@@ -339,7 +378,11 @@ export function ProjectView({ projectId }: ProjectViewProps) {
 
       {/* 텍스트 가독성을 위한 반투명 오버레이 (hover 중에만 표시) */}
       {hasHover && (
-        <div className="pointer-events-none fixed inset-0 bg-black/50" />
+        <div
+          className={`pointer-events-none fixed bg-black/50 transition-[left] duration-200 ${
+            sidebarOpen ? "top-0 right-0 bottom-0 left-0 md:left-[260px]" : "inset-0"
+          }`}
+        />
       )}
 
       {/* 콘텐츠 레이어 */}
@@ -427,7 +470,10 @@ export function ProjectView({ projectId }: ProjectViewProps) {
           />
 
           {/* 이미지 전용 스크롤 컨테이너 (배경은 고정, 이 영역만 스크롤) */}
-          <div className="relative z-10 flex h-full w-full flex-col overflow-auto bg-transparent">
+          <div
+            ref={modalScrollRef}
+            className="relative z-10 flex h-full w-full flex-col overflow-auto bg-transparent"
+          >
             {/* 닫기 버튼 - 모드 버튼과 유사한 위치 */}
             <button
               type="button"
@@ -448,8 +494,29 @@ export function ProjectView({ projectId }: ProjectViewProps) {
               </svg>
             </button>
 
-            <div className="mx-auto w-full max-w-5xl px-4 py-8 bg-transparent">
-              <div className="mb-4">
+            <button
+              type="button"
+              onClick={() =>
+                modalScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })
+              }
+              className="fixed bottom-3 right-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-zinc-200 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white"
+              aria-label="맨 위로 이동"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+              >
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+            </button>
+
+            <div className="mx-auto w-full px-4 py-8 bg-transparent">
+              <div className="mb-4 max-w-5xl">
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">
                   PROJECT DETAIL
                 </p>
@@ -463,14 +530,15 @@ export function ProjectView({ projectId }: ProjectViewProps) {
                 )}
               </div>
 
-              <div className="flex justify-center">
+              <div className="mx-auto w-full max-w-[1440px]">
                 <Image
-                  src={openProject.detailImage ?? openProject.image}
+                  src={`${openProject.detailImage ?? openProject.image}?v=${cacheBust}`}
                   alt={openProject.name}
                   width={1600}
                   height={4000}
-                  className="h-auto w-auto max-w-none"
+                  className="h-auto w-full object-contain"
                   priority
+                  unoptimized
                 />
               </div>
             </div>

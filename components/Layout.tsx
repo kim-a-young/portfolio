@@ -5,7 +5,6 @@ import { MainChat } from "./MainChat";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { ProjectView } from "./ProjectView";
-import { HeroAnimation } from "./HeroAnimation";
 import { useChatHistory } from "@/lib/useChatHistory";
 import {
   getChatHistory,
@@ -16,6 +15,23 @@ import {
 } from "@/lib/chatHistory";
 
 export function Layout() {
+  const introParticles = [
+    // 중앙 큰 알맹이 (더 선명)
+    { left: "48.5%", top: "36%", size: 20, opacity: 0.95, delay: "0s", dur: "2.8s", color: "#61bcf8" },
+    { left: "51.5%", top: "38.5%", size: 18, opacity: 0.9, delay: "0.2s", dur: "3.1s", color: "#7b2bd6" },
+    { left: "50%", top: "41%", size: 16, opacity: 0.92, delay: "0.35s", dur: "2.9s", color: "#61bcf8" },
+    { left: "46.8%", top: "39.5%", size: 14, opacity: 0.85, delay: "0.15s", dur: "3.2s", color: "#7b2bd6" },
+    { left: "53.2%", top: "40.2%", size: 15, opacity: 0.86, delay: "0.45s", dur: "3s", color: "#61bcf8" },
+    // 바깥 작은 알맹이 (더 투명)
+    { left: "43%", top: "34%", size: 8, opacity: 0.45, delay: "0.25s", dur: "2.7s", color: "#7b2bd6" },
+    { left: "57%", top: "34.5%", size: 7, opacity: 0.42, delay: "0.4s", dur: "2.9s", color: "#61bcf8" },
+    { left: "41.5%", top: "41%", size: 6, opacity: 0.38, delay: "0.55s", dur: "3.1s", color: "#61bcf8" },
+    { left: "58.5%", top: "42%", size: 7, opacity: 0.4, delay: "0.1s", dur: "2.8s", color: "#7b2bd6" },
+    { left: "45%", top: "45%", size: 6, opacity: 0.35, delay: "0.5s", dur: "3.3s", color: "#61bcf8" },
+    { left: "55.5%", top: "45.5%", size: 6, opacity: 0.35, delay: "0.3s", dur: "3s", color: "#7b2bd6" },
+    { left: "50%", top: "31.8%", size: 5, opacity: 0.32, delay: "0.6s", dur: "2.6s", color: "#61bcf8" },
+  ];
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -27,11 +43,11 @@ export function Layout() {
   useEffect(() => {
     const exitTimer = setTimeout(() => {
       setIntroStage("exit");
-    }, 1400);
+    }, 2200);
 
     const hideTimer = setTimeout(() => {
       setIntroStage("hidden");
-    }, 2400);
+    }, 3400);
 
     return () => {
       clearTimeout(exitTimer);
@@ -102,28 +118,50 @@ export function Layout() {
       {/* 풀스크린 인트로 오버레이 */}
       {introStage !== "hidden" && (
         <div
-          className={`fixed inset-0 z-40 flex items-center justify-center bg-[radial-gradient(circle_at_top,_#4c1d95_0,_#1d4ed8_30%,_#020617_65%,_#000000_100%)] text-white transition-opacity duration-700 ${
+          className={`fixed inset-0 z-40 flex items-center justify-center text-white transition-opacity duration-700 ${
             introStage === "exit" ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
+          style={{
+            background:
+              "radial-gradient(circle at 50% 46%, #040100 0%, #040100 20%, #07112a 56%, #102d66 100%)",
+          }}
         >
-          <div className="relative flex flex-col items-center gap-6">
-            {/* 아이콘만 빨려 들어가듯 이동/회전 */}
-            <div
-              className={`transform transition-all duration-800 ease-out ${
-                introStage === "exit"
-                  ? "translate-y-[-140px] scale-50 rotate-180 opacity-0"
-                  : "translate-y-0 scale-100 rotate-0 opacity-100"
-              }`}
-            >
-              <div className="animate-[ping_1.4s_ease-out_infinite] rounded-full border border-blue-400/40 p-6">
-                <div className="scale-125 transform drop-shadow-[0_0_80px_rgba(129,140,248,0.9)]">
-                  <HeroAnimation />
-                </div>
-              </div>
-            </div>
+          {/* 텍스트 위쪽 입자 군집 (모였다 퍼졌다 + exit 시 아이콘 쪽으로 빨려감) */}
+          <div
+            className={`pointer-events-none absolute inset-0 transition-all duration-800 ease-out ${
+              introStage === "exit"
+                ? "translate-y-[-90px] scale-50 opacity-0"
+                : "translate-y-0 scale-100 opacity-100"
+            }`}
+            style={{
+              animation: "intro-cluster-breathe 3.1s ease-in-out infinite",
+              transformOrigin: "50% 40%",
+            }}
+          >
+            {introParticles.map((p, index) => (
+              <span
+                key={index}
+                className="absolute rounded-full"
+                style={{
+                  left: p.left,
+                  top: p.top,
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  opacity: p.opacity,
+                  backgroundColor: p.color,
+                  boxShadow:
+                    p.color === "#7b2bd6"
+                      ? "0 0 16px rgba(123,43,214,0.95)"
+                      : "0 0 16px rgba(97,188,248,0.95)",
+                  animation: `intro-particle-breathe ${p.dur} ease-in-out ${p.delay} infinite`,
+                }}
+              />
+            ))}
+          </div>
 
+          <div className="relative flex flex-col items-center gap-6">
             {/* 텍스트는 고정 위치/스타일 유지 */}
-            <div className="text-center">
+            <div className="mt-24 text-center">
               <p className="text-xs uppercase tracking-[0.4em] text-blue-200/80">
                 AYOUNG DESIGN PORTFOLIO
               </p>
@@ -174,7 +212,7 @@ export function Layout() {
           )}
         </div>
         {selectedProject === "projects" ? (
-          <ProjectView projectId={selectedProject} />
+          <ProjectView projectId={selectedProject} sidebarOpen={sidebarOpen} />
         ) : (
           <MainChat
             chatId={currentChatId || undefined}
