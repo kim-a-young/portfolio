@@ -12,8 +12,8 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "아영님 소개 | 면접자 정보 수집",
-  description: "면접자 아영님에 대한 정보를 질문하고 답변받는 소개용 AI",
+  title: "아영님 소개 | 지원자 정보 수집",
+  description: "지원자 아영님에 대한 정보를 질문하고 답변받는 소개용 AI",
 };
 
 export default function RootLayout({

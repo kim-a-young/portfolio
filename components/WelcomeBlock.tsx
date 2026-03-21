@@ -43,7 +43,7 @@ export function WelcomeBlock({
           <Greeting />
           <br />
           <span className="text-[var(--text-primary)]">
-            <span className="font-bold text-hero-gradient">면접자 아영님</span>
+            <span className="font-bold text-hero-gradient">지원자 아영님</span>
             에 대해 알아가볼까요?
           </span>
         </h1>
@@ -52,7 +52,7 @@ export function WelcomeBlock({
             value={input}
             onChange={onInputChange}
             onSubmit={onSubmit}
-            placeholder="면접자 아영님에 대한 정보 수집을 도와드려요! 뭐든 물어보세요..."
+            placeholder="지원자 아영님에 대한 정보 수집을 도와드려요! 뭐든 물어보세요..."
             disabled={isSubmitting}
           />
         </div>

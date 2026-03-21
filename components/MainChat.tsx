@@ -496,7 +496,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                   value={input}
                   onChange={handleInputChange}
                   onSubmit={handleFormSubmit}
-                  placeholder="면접자 아영님에 대한 정보 수집을 도와드려요! 뭐든 물어보세요..."
+                  placeholder="지원자 아영님에 대한 정보 수집을 도와드려요! 뭐든 물어보세요..."
                   disabled={isSubmitting}
                   compact={true}
                 />
