@@ -8,7 +8,9 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    queueMicrotask(() => {
+      setMounted(true);
+    });
   }, []);
 
   // 서버와 클라이언트 초기 렌더링 불일치를 막기 위해

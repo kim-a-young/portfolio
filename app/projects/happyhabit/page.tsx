@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HappyHabitPage() {
   return (
@@ -8,12 +9,12 @@ export default function HappyHabitPage() {
           <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
             해피해빗 앱 리뉴얼
           </h1>
-          <a
+          <Link
             href="/"
             className="text-xs font-medium uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-600"
           >
             BACK
-          </a>
+          </Link>
         </header>
 
         <div className="flex justify-center overflow-auto">

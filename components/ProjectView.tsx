@@ -467,6 +467,9 @@ const PROJECTS: ProjectItem[] = [
   },
 ];
 
+/** hover 배경: 이미지 색 추출 대신 프로젝트 accent 고정 (브랜드 컬러 유지) */
+const ACCENT_FROM_PROJECT_IDS = [7, 8, 10, 12, 13, 14, 17];
+
 export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps) {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -483,9 +486,6 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
 
   // 이미지 로드 전 fallback: 가로형으로 알려진 프로젝트 (orientation 설정되면 실제 비율 사용)
   const LANDSCAPE_PROJECT_IDS = [4, 6, 8, 9, 10, 11];
-
-  /** hover 배경: 이미지 색 추출 대신 프로젝트 accent 고정 (브랜드 컬러 유지) */
-  const ACCENT_FROM_PROJECT_IDS = [7, 8, 10, 12, 13, 14, 17];
 
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
