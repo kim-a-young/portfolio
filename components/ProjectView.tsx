@@ -24,47 +24,57 @@ type ProjectItem = {
   detailDescription?: string;
 };
 
-/** detailImage 없는 항목 하단 설명 영역 기본 본문 */
-const DEFAULT_DETAIL_DESCRIPTION =
-  "디렉터스테크는 최첨단 인공지능 콘텐츠입니다. 생성 기술인 AIGC(AI 생성 콘텐츠)를 사용하여 자동으로 비디오를 생성합니다. 국내 최고의 TVC 광고 제작 전문가들의 노하우를 결합하여 제품 고유의 가치 제안(USP)을 강조하고 효과적으로 전달합니다. 고품질의 비디오를 제작하세요. 또한, 합리적인 제작비와 빠른 제작기간을 통해 고객의 요구를 충족시키고, 다양한 영상 콘텐츠를 통해 기업의 커뮤니케이션 전략에 혁신적인 변화를 가져올 수 있도록 돕습니다.";
+function projectHasDetailWriteup(project: ProjectItem): boolean {
+  const body = project.detailDescription?.trim() ?? "";
+  const hasCustomMeta = Boolean(
+    project.detailDesignTypes?.trim() || project.detailTools?.trim()
+  );
+  return Boolean(body) || hasCustomMeta;
+}
 
 function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
+  const rawBody = project.detailDescription?.trim() ?? "";
+  const hasCustomMeta = Boolean(
+    project.detailDesignTypes?.trim() || project.detailTools?.trim()
+  );
+  if (!rawBody && !hasCustomMeta) return null;
+
   const designTypes =
     project.detailDesignTypes ?? "Reactive Design, UI/UX Design";
   const toolsLine =
     project.detailTools ?? "Tool : Figma, XD, Photoshop, Illustrator";
-  const rawBody = project.detailDescription ?? DEFAULT_DETAIL_DESCRIPTION;
   const paragraphs = rawBody
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
 
+  const leftColumn = (
+    <div className="min-w-0 md:max-w-[25vw]">
+      <h3 className="text-base font-bold tracking-tight text-white">Design</h3>
+      <p className="mt-4 text-sm leading-relaxed text-zinc-300">{designTypes}</p>
+      <p className="mt-3 text-sm leading-relaxed text-zinc-300">{toolsLine}</p>
+    </div>
+  );
+
   return (
     <section
-      className="mx-auto mt-12 w-full max-w-[1440px] border-t border-zinc-800 pt-12 pb-8"
+      className="mt-12 w-full max-w-[1440px] border-t border-zinc-800 pt-12 pb-8"
       aria-label="프로젝트 상세 설명"
     >
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,40vw)_minmax(0,1fr)] md:items-start md:gap-x-10 lg:gap-x-14">
-        <div className="min-w-0 md:max-w-[320px] lg:max-w-[360px]">
-          <h3 className="text-base font-bold tracking-tight text-white">
-            Design
-          </h3>
-          <p className="mt-4 text-sm leading-relaxed text-zinc-300">
-            {designTypes}
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-zinc-300">
-            {toolsLine}
-          </p>
+      {paragraphs.length > 0 ? (
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,25vw)_minmax(0,1fr)] md:items-start md:gap-x-5 lg:gap-x-6">
+          {leftColumn}
+          <div className="min-w-0 space-y-4">
+            {paragraphs.map((para, i) => (
+              <p key={i} className="text-sm leading-[1.75] text-zinc-200">
+                {para}
+              </p>
+            ))}
+          </div>
         </div>
-
-        <div className="min-w-0 space-y-4 md:pl-2">
-          {paragraphs.map((para, i) => (
-            <p key={i} className="text-sm leading-[1.75] text-zinc-200">
-              {para}
-            </p>
-          ))}
-        </div>
-      </div>
+      ) : (
+        leftColumn
+      )}
     </section>
   );
 }
@@ -233,7 +243,13 @@ const PROJECTS: ProjectItem[] = [
     meta: "앱 · 고도화",
     detailDesignTypes: "App, BackOffice UI/UX Design 100%",
     detailTools: "Tool : XD, Photoshop, Illustrator",
-    detailDescription: `대한적십자사의 공식 헌혈 앱 '레드커넥트'는 비대면 서비스 확대와 함께 사용자 경험 개선이 필요한 프로젝트였습니다. 기존 서비스는 사용자 동선이 분절되어 있고 접근성 기준을 충족하지 못한 화면이 존재하여 UX 개선이 요구되었습니다. 고객사의 요구사항과 서비스 방향을 반영하여 헌혈 예약부터 방문, 결과 확인, 증서 발급까지 이어지는 흐름을 정리하고, 비대면 중심의 서비스 화면으로 UI 구조 정의 및 접근성 개선을 전반적으로 담당하며, 공공 서비스 기준에 맞는 인터페이스로 정비하였습니다. 또한 기존 UI 패턴을 유지하면서 사용성을 개선하고, 백오피스 설계에 참여하여 운영 효율성과 관리 편의성을 고려한 서비스 구축에 기여하였습니다. 그 결과, 접근성 인증 마크를 획득하며 서비스 신뢰도를 강화하였고, 예약부터 발급까지 이어지는 비대면 헌혈 서비스 경험을 보다 안정적으로 제공할 수 있도록 개선하였습니다.`,
+    detailDescription: `대한적십자사의 공식 헌혈 앱 '레드커넥트'는 비대면 서비스 확대와 함께 사용자 경험 개선이 필요한 프로젝트였습니다. 기존 서비스는 사용자 동선이 분절되어 있고 접근성 기준을 충족하지 못한 화면이 존재하여 UX 개선이 요구되었습니다.
+
+고객사의 요구사항과 서비스 방향을 반영하여 헌혈 예약부터 방문, 결과 확인, 증서 발급까지 이어지는 흐름을 정리하고, 비대면 중심의 서비스 화면으로 UI 구조 정의 및 접근성 개선을 전반적으로 담당하며, 공공 서비스 기준에 맞는 인터페이스로 정비하였습니다.
+
+또한 기존 UI 패턴을 유지하면서 사용성을 개선하고, 백오피스 설계에 참여하여 운영 효율성과 관리 편의성을 고려한 서비스 구축에 기여하였습니다.
+
+그 결과, 접근성 인증 마크를 획득하며 서비스 신뢰도를 강화하였고, 예약부터 발급까지 이어지는 비대면 헌혈 서비스 경험을 보다 안정적으로 제공할 수 있도록 개선하였습니다.`,
   },
   {
     id: 4,
@@ -304,6 +320,13 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_oled_m.png",
     accent: "#BE1441", // 고정 배경 컬러
     meta: "모바일 · 전시",
+    detailDesignTypes: "Web, Mobile Design 100%",
+    detailTools: "Tool : Photoshop, Illustrator",
+    detailDescription: `LG OLED SPACE 웹사이트는 OLED 기술의 강점과 차별성을 사용자에게 직관적으로 전달하기 위해 기획된 브랜드 콘텐츠 플랫폼입니다. 기술 중심의 정보를 나열하기보다, 비주얼 중심의 UI를 통해 OLED의 색감과 명암, 선명도를 감각적으로 전달하는 것이 중요한 프로젝트였습니다.
+
+고해상도 이미지와 영상 중심의 인터페이스를 설계하여 OLED의 표현력을 효과적으로 드러내고, 콘텐츠 흐름에 따라 브랜드 메시지가 자연스럽게 전달될 수 있도록 웹과 모바일 환경에 맞는 화면을 구성하였습니다. 또한 다양한 디바이스 환경에서도 일관된 경험이 제공될 수 있도록 반응형 웹을 고려한 UI를 설계하였습니다.
+
+그 결과, OLED 기술의 강점을 시각적으로 강조한 콘텐츠 중심의 웹사이트를 완성하였으며, 브랜드 메시지를 직관적으로 전달할 수 있는 비주얼 중심 UI를 구축하였습니다.`,
   },
   {
     id: 9,
@@ -329,6 +352,13 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_yju_m.png",
     accent: "#007fa0", // 대학 마크 컬러
     meta: "웹 · 교육",
+    detailDesignTypes: "Web, Mobile Design 100%",
+    detailTools: "Tool : Photoshop, Illustrator",
+    detailDescription: `영진전문대학 웹사이트 및 입학처 사이트는 입학, 학과, 공지 등 다양한 정보를 사용자에게 명확하게 전달하는 것이 중요한 교육 서비스 플랫폼입니다. 특히 방대한 정보 구조와 복잡한 메뉴 체계를 효율적으로 정리하여 가독성과 접근성이 필요했습니다.
+
+대학의 심벌마크와 시그니처 컬러를 디자인 요소로 활용하여 브랜드 아이덴티티를 UI 전반에 반영하고, 정보의 우선순위를 고려한 레이아웃과 텍스트 구조를 설계하여 사용자가 필요한 정보를 빠르게 탐색할 수 있도록 화면을 구성하였습니다.
+
+또한 PC와 모바일 환경을 고려한 반응형 웹 디자인을 적용하여 다양한 디바이스에서도 일관된 정보 전달이 가능하도록 UI를 구축하였습니다.`,
   },
   {
     id: 11,
@@ -337,14 +367,15 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_semas_m.png",
     accent: "#ea580c", // 오렌지
     meta: "웹 · 공공서비스",
-  },
-  {
-    id: 12,
-    name: "현대자동차연구소 표준개발시스템 구축",
-    url: "#",
-    image: "/images/pf_hyundaimotorgroup_m.png",
-    accent: "#0A2366", // 현대 브랜드 딥 블루 (hover 배경 고정)
-    meta: "웹 · 시스템 구축",
+    detailDesignTypes: "Web Design 100%",
+    detailTools: "Tool : Photoshop, Illustrator",
+    detailDescription: `전통시장화재공제 웹사이트는 전통시장 상인을 대상으로 화재 피해를 대비할 수 있는 공제 제도를 안내하고 가입을 유도하는 공공 서비스 플랫폼으로, 복잡한 제도를 쉽고 직관적으로 전달하는 것이 중요한 프로젝트였습니다.
+
+사용자의 이해도를 높이기 위해 정보 구조를 단순화하고, 공제 개념과 가입 절차를 직관적으로 전달할 수 있도록 전체 페이지 UI를 설계하였습니다. 특히 가입 과정에서의 진입 장벽을 낮추기 위해 단계별 흐름을 간소화하고, 사용자가 자연스럽게 선택하며 진행할 수 있는 인터페이스를 구성하였습니다.
+
+또한 디자인 가이드를 수립하여 퍼블리싱 및 개발 과정에서도 일관된 UI가 유지될 수 있도록 기반을 마련하고, 서비스 전반에 걸쳐 안정적인 디자인 품질을 유지할 수 있도록 하였습니다.
+
+그 결과, 복잡한 공제 서비스에 대한 이해도를 높이는 접근성 웹사이트를 구축하였으며, 사용자 친화적인 가입 흐름을 통해 서비스 이용 활성화에 기여할 수 있는 기반을 마련하였습니다.`,
   },
   {
     id: 13,
@@ -353,14 +384,12 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_skncar_m.png",
     accent: "#ea580c", // 오렌지 (기존 다크 브라운보다 밝게, 다른 프로젝트 톤과 맞춤)
     meta: "웹 · 시스템 구축",
-  },
-  {
-    id: 14,
-    name: "한국스마트카드 사업관리시스템 구축",
-    url: "#",
-    image: "/images/pf_tmoney_m.png",
-    accent: "#898989", // RGB 137,137,137 (hover 배경 고정)
-    meta: "웹 · 시스템 구축",
+    detailTools: "Tool : Nexacro, Photoshop, Illustrator",
+    detailDescription: `SK엔카의 사업 운영을 지원하는 내부 관리 시스템은 방대한 거래 데이터와 지점별 운영 현황을 효율적으로 관리하는 것이 중요한 플랫폼으로, 분산된 업무 환경에서도 일관된 사용 경험과 높은 가독성에 집중하였습니다.
+
+넥사크로 기반의 인터페이스와 컴포넌트를 설계하고, 대시보드를 통해 지점별 판매 현황을 직관적으로 비교하고 빠르게 파악할 수 있도록 데이터 시각화 중심의 UI를 구성하였습니다. 또한 반복적으로 사용되는 UI 요소를 체계화하여 화면 간 일관성을 유지하고, 사용자의 학습 부담을 줄일 수 있도록 인터페이스를 정리하였습니다.
+
+더불어 시스템 전반에 적용 가능한 디자인 가이드를 수립하여 지점 및 조직별로 동일한 UI 환경을 유지하여 지점 간 업무 환경의 차이를 줄이고 일관된 사용자 경험과 업무 수행 방식을 지원할 수 있는 UI 체계를 마련하였습니다.`,
   },
   {
     id: 15,
@@ -369,6 +398,32 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_miraeasset_m.png",
     accent: "#1d4ed8", // 블루
     meta: "웹 · 금융 시스템",
+    detailTools: "Tool : Nexacro, Photoshop, Illustrator",
+    detailDescription: `미래에셋증권의 OMS(Order Management System)는 대량의 금융 데이터를 기반으로 빠른 의사결정과 정확한 업무 처리가 요구되는 내부 업무 시스템으로, 장시간 사용 환경에서도 효율적이고 일관된 UI를 제공하는 것이 중요한 프로젝트였습니다.
+
+이에 넥사크로 기반의 인터페이스와 컴포넌트를 설계하고, 사용자 업무 유형과 개인 선호에 따라 화면 구성이 가능하도록 Floating Mode와 Frame Mode의 2가지 레이아웃 구조를 정의하였습니다. 또한 4가지 컬러 테마를 제공하여 사용자 환경에 맞춘 개인화 UI를 구현하고, MindMap 기반의 메뉴 구조를 통해 주요 기능에 빠르게 접근할 수 있도록 인터페이스를 설계하였습니다.
+
+더불어 시스템 전반에 적용 가능한 디자인 가이드를 수립하여 화면 간 일관성을 유지하고, 반복 업무에 대한 학습 부담을 줄일 수 있도록 UI 표준을 정리하였습니다.
+
+그 결과, 사용자 맞춤형 UI 환경을 통해 업무 몰입도와 처리 효율을 향상시켰으며, 데이터 중심 업무에 적합한 정보 구조와 인터페이스를 기반으로 빠른 정보 파악과 의사결정을 지원할 수 있는 확장 가능한 시스템을 구축하였습니다.`,
+  },
+  {
+    id: 12,
+    name: "현대자동차연구소 표준개발시스템 구축",
+    url: "#",
+    image: "/images/pf_hyundaimotorgroup_m.png",
+    accent: "#0A2366", // 현대 브랜드 딥 블루 (hover 배경 고정)
+    meta: "웹 · 시스템 구축",
+    detailTools: "Tool : Nexacro, Photoshop, Illustrator",
+  },
+  {
+    id: 14,
+    name: "한국스마트카드 사업관리시스템 구축",
+    url: "#",
+    image: "/images/pf_tmoney_m.png",
+    accent: "#898989", // RGB 137,137,137 (hover 배경 고정)
+    meta: "웹 · 시스템 구축",
+    detailTools: "Tool : Nexacro, Photoshop, Illustrator",
   },
   {
     id: 16,
@@ -377,6 +432,8 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_befemall_m.png",
     accent: "#fb7185", // 코랄/핑크
     meta: "앱 · 커머스",
+    detailDesignTypes: "App Design 100%",
+    detailTools: "Tool : Photoshop, Illustrator",
   },
   {
     id: 17,
@@ -385,6 +442,8 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_lguplus_m.png",
     accent: "#898989", // RGB 137,137,137 (hover 배경 고정)
     meta: "모바일 · 서브페이지",
+    detailDesignTypes: "Mobile Sub Design, Graphic Design",
+    detailTools: "Tool : Photoshop, Illustrator",
   },
   {
     id: 18,
@@ -393,6 +452,8 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_amio_m.png",
     accent: "#16a34a", // 그린
     meta: "웹 · 커머스",
+    detailDesignTypes: "Web Design 100%, Visual Design",
+    detailTools: "Tool : Photoshop, Illustrator",
   },
   {
     id: 19,
@@ -401,6 +462,8 @@ const PROJECTS: ProjectItem[] = [
     image: "/images/pf_kyunghee_m.png",
     accent: "#334155", // 블루 그레이
     meta: "웹 · 교육",
+    detailDesignTypes: "Web Design 100%",
+    detailTools: "Tool : Photoshop, Illustrator",
   },
 ];
 
@@ -720,7 +783,7 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
       </div>
 
       {openProject && (
-        <div className="fixed inset-0 z-40 bg-black/90">
+        <div className="fixed inset-0 z-40 bg-black/[0.97]">
           {/* 딤 영역 클릭 시 닫기 */}
           <button
             type="button"
@@ -775,7 +838,7 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
               </svg>
             </button>
 
-            <div className="mx-auto w-full px-4 py-8 bg-transparent">
+            <div className="w-full py-8 pl-2 pr-4 sm:pl-3 sm:pr-5 md:pl-4 md:pr-6 bg-transparent">
               <div className="mb-4 max-w-5xl">
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">
                   PROJECT DETAIL
@@ -790,7 +853,7 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
                 )}
               </div>
 
-              <div className="mx-auto w-full max-w-[1440px]">
+              <div className="w-full max-w-[1440px]">
                 <Image
                   src={`${
                     openProject.detailImage ?? openProject.image
@@ -804,9 +867,10 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
                 />
               </div>
 
-              {!openProject.detailImage && (
-                <ProjectDetailDescriptionBlock project={openProject} />
-              )}
+              {!openProject.detailImage &&
+                projectHasDetailWriteup(openProject) && (
+                  <ProjectDetailDescriptionBlock project={openProject} />
+                )}
             </div>
           </div>
         </div>
