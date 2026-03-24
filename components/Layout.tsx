@@ -9,7 +9,7 @@ import { useChatHistory } from "@/lib/useChatHistory";
 import {
   getChatHistory,
   addChatToHistory,
-  generateChatTitle,
+  resolveChatTitle,
   type ChatHistory,
   type Message,
 } from "@/lib/chatHistory";
@@ -59,16 +59,20 @@ export function Layout() {
         setCurrentChatId(chatIdToUse);
       }
 
-      const title = generateChatTitle(newMessages);
-      const chat: ChatHistory = {
-        id: chatIdToUse,
-        title,
-        messages: newMessages,
-        createdAt: currentChatId ? getChatHistory().find((c) => c.id === currentChatId)?.createdAt || now : now,
-        updatedAt: now,
-      };
+      void (async () => {
+        const title = await resolveChatTitle(newMessages, chatIdToUse);
 
-      addChatToHistory(chat);
+        const existing = getChatHistory().find((c) => c.id === chatIdToUse);
+        const chat: ChatHistory = {
+          id: chatIdToUse,
+          title,
+          messages: newMessages,
+          createdAt: existing?.createdAt ?? now,
+          updatedAt: Date.now(),
+        };
+
+        addChatToHistory(chat);
+      })();
     },
     [currentChatId]
   );

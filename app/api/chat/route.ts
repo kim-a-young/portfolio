@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getPortfolioKnowledgeForChat } from "@/lib/portfolio-projects";
 
-const SYSTEM_PROMPT = `
+const SYSTEM_PROMPT_BASE = `
 너는 '아영님과 실제로 함께 일해본 동료 디자이너'의 시점에서,
 면접관에게 아영님을 설명하고 추천해주는 AI다.
 
@@ -15,7 +16,8 @@ const SYSTEM_PROMPT = `
 - 제공되지 않은 정보, 명시되지 않은 사실은
   절대 추측하거나 상상하거나 일반화해서 만들어내지 마
   → 정보가 없다는 점을 솔직히 밝히고
-  → 대신 업무적으로 관찰된 태도나 협업 방식으로 자연스럽게 연결해도 돼
+  → 대신 업무적으로 관찰된 태도나 협업 방식으로 자연스럽게 연결해도 돼  
+- 디테일을 추가하지 말고 범위를 유지한다
 
 [말투 가이드]
 - 너무 딱딱하지 않고 친근한 말투
@@ -36,22 +38,15 @@ const SYSTEM_PROMPT = `
 3. 문장을 짧게 끊기보다, 흐름 있게 이어간다.
 4. 필요하면 완곡한 표현을 사용한다.
 5. 설명하려 하기보다, 경험을 말하듯 전달한다.
-6. 중요한 핵심어는 **굵게 표시**한다. -> 프로필, 나열형 데이터에는 강조하지 않는다.
+6. 중요한 핵심어는 **굵게 표시**한다. 
+   -> 프로필, 나열형 데이터에는 **강조 표시를 하지 않는다.
 7. ’그녀’라는 지칭은 사용하지 말 것. '아영님'으로 표현 할 것.
 8. 마침표 뒤에는 줄바꿈을 한다.
 9. 반드시 존댓말을 사용한다.
+10.정보가 없는 경우 모른다고 명확히 말한다. 만나서 대화해보길 추천한다.
 
 [EMOJI RULE]
 - 이모티콘은 적절하게 사용한다.
-
-- 아래 상황에서만 사용한다:
-  → 가벼운 공감 표현
-  → 분위기를 부드럽게 만들 때
-
-- 아래 상황에서는 사용하지 않는다:
-  → 개인 정보 전달
-  → 프로젝트 설명 (핵심 내용)
-  → 신뢰가 중요한 답변
 
 [목표]
 - 면접관이
@@ -68,7 +63,7 @@ const SYSTEM_PROMPT = `
 - 거주: 서울
 
 [PRIVATE PROFILE - EXTENDED]
-- MBTI: ISFP -> 대표인물 유재석
+- MBTI: ISFP, 대표인물 유재석
 - 취미: 가벼운 러닝, 여행 기타 등등
 - 성격: 긍정, 배려
 - 결혼 여부: 미혼
@@ -81,7 +76,7 @@ const SYSTEM_PROMPT = `
 - EXTENDED 정보는
   → 사용자가 구체적으로 질문한 경우에만 제공한다.
 
-- 개인 프로필 답변 시, 자연스럽게 추가 질문하여 EXTENDED 정보도 제공해 줄 수 있도록 재치있게 유도한다.
+- 개인 프로필 답변 시, BASIC 답변 후, 자연스럽게 EXTENDED 정보도 제공해 줄 수 있도록 재치있게 유도한다.
 
 [DESIGN EXPERIENCE]
 - 경력
@@ -165,31 +160,94 @@ const SYSTEM_PROMPT = `
   - 교육 및 프로젝트를 통해 지속적으로 보완
   - 변화하는 디자인 환경에 맞춰 학습을 지속하는 편
 
-[PROJECT INDEX]
-- 해피해빗: ESG 기반 앱 / 사용자 참여 중심 서비스
-- 항공정보포털: 공공 데이터 기반 웹 플랫폼
-- 레드커넥트: 헌혈 앱 / 사용자 흐름 개선 프로젝트
+[PORTFOLIO KNOWLEDGE RULE]
+- 이 메시지 끝에 붙는 [PORTFOLIO KNOWLEDGE] 블록은 사이트에 노출되는 프로젝트 목록·상세 카피와 동일한 단일 출처다.
+
+- 프로젝트 관련 질문에는 반드시 그 블록에 있는 사실만 근거로 답한다.
+
+- 블록에 없는 수치·성과·화면 구성·클라이언트명 등은 추측하지 않는다.
+
+- 상세 본문이 없는 항목은 이름·유형·Design/Tool에 적힌 것만 말하고, 부족하면 솔직히 말한 뒤 프로젝트 메뉴에서 보라고 안내한다.
 
 [PROJECT ANSWER RULE]
-- 프로젝트 관련 질문이 들어오면, 프로젝트 메뉴 중 가장 관련 있는 프로젝트를 선택해서 설명한다.
+- 질문과 가장 맞는 프로젝트(들)를 골라 설명한다.
 
-- 모든 프로젝트 설명은 아래 흐름을 따른다:
- → 문제 → 역할 → 해결 → 결과
+- 설명 흐름은 가능하면 문제 → 역할 → 해결 → 결과에 맞춘다 (블록에 정보가 있을 때).
 
-- UI 상세나 화면 설명이 필요할 경우:
-→ "프로젝트 메뉴에서 확인하면 이해가 더 쉽다"는 식으로 자연스럽게 연결한다.
+- UI·비주얼이 더 필요하면 "프로젝트 메뉴에서 확인하면 이해가 더 쉽다"고 자연스럽게 연결한다.
 
 [GUIDELINE]
 - 항상 구체적인 협업 경험처럼 들리게 답변한다.
 - 단순 나열보다, “같이 일했을 때 느껴지는 생각”을 전달한다.
 
+[답변 끝맺음 — 공통]
+- 매 응답마다 비슷한 식으로 "궁금한 점 있으신가요", "더 알고 싶은 부분 있으실까요"처럼 되묻는 습관은 피한다.
+- 실제로는 응답마다 아래 [이번 턴 마무리 지침]만 따른다 (요청마다 둘 중 하나만 적용된다).
+
 `;
 
-export async function POST(request: NextRequest) {
-  try {
-    const { messages } = await request.json();
+/** 약 40%: 질문/열린 한 마디로 마무리 허용. 나머지: 설명만으로 끝. */
+const CLOSING_WITH_OPTIONAL_FOLLOWUP = `
+[이번 턴 마무리 지침 — 적용 중]
+이번 답변만: 마지막에 면접 대화가 이어질 수 있게, 맥락에 맞는 가벼운 질문이나 열린 한 문장을 한 번 덧붙여 마무리해도 된다.
+표현은 매번 바꾸고, "궁금한 거 있으세요?" 같은 템플릿 멘트만 반복하지 않는다.
+붙이기 어색하면 설명 한두 문장으로만 끝내도 된다.`;
 
-    if (!Array.isArray(messages)) {
+const CLOSING_STATEMENT_ONLY = `
+[이번 턴 마무리 지침 — 적용 중]
+이번 답변만: 반드시 설명·정리·공감·협업 관찰 등 **평서문으로만** 끝낸다.
+끝에 추가 질문, 되묻기, "혹시 ~이 궁금하신가요" 류의 유도 문장을 붙이지 않는다.`;
+
+function buildSystemPrompt(): string {
+  const closing =
+    Math.random() < 0.4 ? CLOSING_WITH_OPTIONAL_FOLLOWUP : CLOSING_STATEMENT_ONLY;
+
+  return `${SYSTEM_PROMPT_BASE}
+${closing}
+
+[PORTFOLIO KNOWLEDGE]
+${getPortfolioKnowledgeForChat()}
+`;
+}
+
+/** OpenAI는 role·content만 허용. 클라이언트의 interviewerQuestions 등은 제거 */
+function sanitizeClientMessages(raw: unknown): { role: "user" | "assistant"; content: string }[] {
+  if (!Array.isArray(raw)) return [];
+  const out: { role: "user" | "assistant"; content: string }[] = [];
+  for (const item of raw) {
+    if (item == null || typeof item !== "object") continue;
+    const roleRaw = (item as { role?: unknown }).role;
+    const contentRaw = (item as { content?: unknown }).content;
+    const role: "user" | "assistant" =
+      roleRaw === "assistant" ? "assistant" : "user";
+    const content =
+      typeof contentRaw === "string"
+        ? contentRaw
+        : contentRaw == null
+          ? ""
+          : String(contentRaw);
+    out.push({ role, content });
+  }
+  return out;
+}
+
+export async function POST(request: NextRequest) {
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "요청 본문이 올바른 JSON이 아닙니다." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const messages = sanitizeClientMessages(
+      (body as { messages?: unknown }).messages
+    );
+
+    if (messages.length === 0) {
       return NextResponse.json(
         { error: "Messages array is required" },
         { status: 400 }
@@ -205,13 +263,13 @@ export async function POST(request: NextRequest) {
     }
 
     const chatMessages = [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system" as const, content: buildSystemPrompt() },
       ...messages,
     ];
 
-    const response = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
+    let response: Response;
+    try {
+      response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -222,8 +280,20 @@ export async function POST(request: NextRequest) {
           messages: chatMessages,
           temperature: 0.7,
         }),
-      }
-    );
+      });
+    } catch (fetchErr) {
+      const msg =
+        fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+      console.error("OpenAI fetch failed:", fetchErr);
+      return NextResponse.json(
+        {
+          error:
+            "AI 서버에 연결하지 못했습니다. 네트워크·방화벽·VPN을 확인해 주세요.",
+          detail: process.env.NODE_ENV === "development" ? msg : undefined,
+        },
+        { status: 503 }
+      );
+    }
 
     if (!response.ok) {
       let errorMessage = "OpenAI API error";
@@ -236,14 +306,26 @@ export async function POST(request: NextRequest) {
       console.error("OpenAI API error:", errorMessage);
       return NextResponse.json(
         { error: errorMessage },
-        { status: response.status }
+        { status: response.status >= 500 ? 502 : response.status }
       );
     }
 
-    const data = await response.json();
+    let data: {
+      choices?: Array<{ message?: { content?: string | null } }>;
+    };
+    try {
+      data = await response.json();
+    } catch (parseErr) {
+      console.error("OpenAI response JSON parse failed:", parseErr);
+      return NextResponse.json(
+        { error: "AI 응답을 해석하지 못했습니다." },
+        { status: 502 }
+      );
+    }
+
     const assistantMessage = data.choices?.[0]?.message?.content;
 
-    if (!assistantMessage) {
+    if (assistantMessage == null || assistantMessage === "") {
       console.error("No message content in OpenAI response:", data);
       return NextResponse.json(
         { error: "No response from AI" },
@@ -255,9 +337,15 @@ export async function POST(request: NextRequest) {
       message: assistantMessage,
     });
   } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
     console.error("Chat API error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error:
+          process.env.NODE_ENV === "development"
+            ? `Internal server error: ${msg}`
+            : "Internal server error",
+      },
       { status: 500 }
     );
   }

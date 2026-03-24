@@ -85,11 +85,91 @@ export function getChatById(chatId: string): ChatHistory | null {
   return history.find((c) => c.id === chatId) || null;
 }
 
-export function generateChatTitle(messages: Message[]): string {
-  // 첫 번째 사용자 메시지의 첫 30자를 제목으로 사용
-  const firstUserMessage = messages.find((m) => m.role === "user");
-  if (firstUserMessage) {
-    return firstUserMessage.content.slice(0, 30).trim() + (firstUserMessage.content.length > 30 ? "..." : "");
-  }
-  return "새 채팅";
+/** 이보다 짧으면 인사·단답 등으로 보고 로컬 제목 (그 외는 의미 요약 API 사용) */
+const TITLE_LOCAL_MAX = 14;
+
+/** 같은 채팅·같은 첫 질문에 대해 LLM 제목 요약을 한 번만 호출 */
+const smartTitleInFlight = new Map<string, Promise<string>>();
+const smartTitleResolved = new Map<string, string>();
+
+function smartTitleKey(chatId: string, firstUserTrimmed: string): string {
+  return `${chatId}::${firstUserTrimmed}`;
 }
+
+/** 아주 짧은 메시지용: 공백 정리 후 그대로 (긴 질문은 LLM 의미 요약으로 처리) */
+export function simpleTitle(text: string): string {
+  const t = text.replace(/\s+/g, " ").trim();
+  return t || "새 채팅";
+}
+
+function firstUserText(messages: Message[]): string | null {
+  const m = messages.find((x) => x.role === "user");
+  if (!m?.content) return null;
+  return m.content;
+}
+
+/** 긴 첫 메시지: 대화 맥락으로 목록용 제목 생성 */
+export async function generateSmartTitle(messages: Message[]): Promise<string> {
+  const first = firstUserText(messages);
+  if (!first) return "새 채팅";
+
+  try {
+    const res = await fetch("/api/chat/title", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages }),
+    });
+    if (!res.ok) {
+      const retry = await fetch("/api/chat/title", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages }),
+      });
+      if (retry.ok) {
+        const data2 = (await retry.json()) as { title?: string };
+        const t2 = data2.title?.trim();
+        if (t2) return t2;
+      }
+      return simpleTitle(first);
+    }
+    const data = (await res.json()) as { title?: string };
+    const title = data.title?.trim();
+    if (title) return title;
+  } catch {
+    // fall through
+  }
+  return simpleTitle(first);
+}
+
+/**
+ * 첫 사용자 메시지 길이에 따라 로컬 제목 vs LLM 제목.
+ * `chatId`를 넘기면 동일 대화에서 히스토리 갱신 시 요약 API 중복 호출을 막는다.
+ */
+export async function resolveChatTitle(
+  messages: Message[],
+  chatId: string
+): Promise<string> {
+  const raw = firstUserText(messages);
+  if (!raw) return "새 채팅";
+
+  const trimmed = raw.trim();
+  if (trimmed.length <= TITLE_LOCAL_MAX) {
+    return simpleTitle(trimmed);
+  }
+
+  const key = smartTitleKey(chatId, trimmed);
+  const done = smartTitleResolved.get(key);
+  if (done) return done;
+
+  let pending = smartTitleInFlight.get(key);
+  if (!pending) {
+    pending = generateSmartTitle(messages).then((title) => {
+      smartTitleResolved.set(key, title);
+      smartTitleInFlight.delete(key);
+      return title;
+    });
+    smartTitleInFlight.set(key, pending);
+  }
+  return pending;
+}
+
