@@ -2,6 +2,8 @@ export type Message = {
   role: "user" | "assistant";
   content: string;
   interviewerQuestions?: string[]; // 사용자 메시지에 연결된 면접관 질문들
+  /** 이력·프로필 답변 턴에 서버가 내려주면 채팅에 프로필 사진을 함께 표시 */
+  showProfilePhoto?: boolean;
 };
 
 export interface ChatHistory {

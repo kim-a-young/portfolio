@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 type Role = "user" | "assistant";
@@ -7,6 +8,7 @@ type Role = "user" | "assistant";
 interface ChatMessageProps {
   role: Role;
   content: string;
+  showProfilePhoto?: boolean;
   isTyping?: boolean;
   interviewerQuestions?: string[];
   showInterviewerPrompt?: boolean;
@@ -19,6 +21,7 @@ interface ChatMessageProps {
 export function ChatMessage({
   role,
   content,
+  showProfilePhoto = false,
   isTyping = false,
   interviewerQuestions,
   showInterviewerPrompt = false,
@@ -68,6 +71,17 @@ export function ChatMessage({
         </>
       ) : (
         <>
+          {showProfilePhoto && (
+            <div className="mb-3 flex w-full justify-start">
+              <Image
+                src="/images/profile-ayoung.png"
+                alt="김아영 프로필 사진"
+                width={88}
+                height={88}
+                className="rounded-2xl object-cover shadow-md ring-2 ring-[var(--border)]"
+              />
+            </div>
+          )}
           <div className="w-full text-[15px] leading-relaxed whitespace-pre-wrap text-[var(--text-primary)]">
             {displayedContent}
             {isAnimating && <span className="animate-pulse">|</span>}

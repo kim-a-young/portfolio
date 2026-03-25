@@ -44,7 +44,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     }
   }, [chatId, initialMessages.length]);
 
-  // 30초 타이머: 마지막 어시스턴트 메시지 완료 후 30초 경과 시 해당 어시스턴트 메시지에 "음...그..." 버튼 표시
+  // 35초 타이머: 마지막 어시스턴트 메시지 완료 후 35초 경과 시 해당 어시스턴트 메시지에 "음...그..." 버튼 표시
   useEffect(() => {
     // 타이머 초기화
     if (timerRef.current) {
@@ -67,7 +67,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
       
       timerRef.current = setTimeout(() => {
         setAssistantMessageWithPrompt(lastAssistantIndex);
-      }, 30000); // 30초
+      }, 35000); // 35초
     }
 
     return () => {
@@ -177,7 +177,11 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     }
   }, [typingMessageIndex]);
 
-  const handleSubmit = async (questionText?: string) => {
+  const handleSubmit = async (
+    questionText?: string,
+    /** 메인 키워드 '개인 프로필' pill로 보낸 질문일 때만 true */
+    showProfilePhotoWithReply = false
+  ) => {
     // questionText가 제공되면 사용하고, 없으면 input 사용
     const textToSubmit = questionText || input;
     const text = typeof textToSubmit === "string" ? textToSubmit.trim() : "";
@@ -249,6 +253,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
       const assistantMessage: Message = {
         role: "assistant",
         content: data.message,
+        ...(showProfilePhotoWithReply ? { showProfilePhoto: true } : {}),
       };
       const newMessages = [...updatedMessages, assistantMessage];
       setMessages(newMessages);
@@ -305,9 +310,8 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     handleSubmit();
   };
 
-  const handleKeywordSelect = (_pillId: KeywordPillId, label: string) => {
-    // 키워드 선택 시 자동으로 제출
-    handleSubmit(label);
+  const handleKeywordSelect = (pillId: KeywordPillId, label: string) => {
+    handleSubmit(label, pillId === "profile");
   };
 
   const handleInterviewerPromptClick = async (assistantIndex: number) => {
@@ -462,6 +466,9 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                     <ChatMessage
                       role={msg.role}
                       content={msg.content}
+                      showProfilePhoto={
+                        msg.role === "assistant" ? msg.showProfilePhoto === true : false
+                      }
                       isTyping={typingMessageIndex === i && msg.role === "assistant"}
                       interviewerQuestions={isAssistantMessage ? msg.interviewerQuestions : undefined}
                       showInterviewerPrompt={showPrompt}
