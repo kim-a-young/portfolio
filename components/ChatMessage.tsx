@@ -2,8 +2,19 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 type Role = "user" | "assistant";
+
+const markdownProseAssistant =
+  "[&_p]:mt-0 [&_p]:mb-0 [&_p]:leading-relaxed [&_p:not(:last-child)]:mb-[1.625em] [&_strong]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_li]:my-0.5 [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-[var(--subtle-gray)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.9em] [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-[var(--subtle-gray)] [&_pre]:p-3 [&_blockquote]:my-2 [&_blockquote]:border-l-2 [&_blockquote]:border-[var(--border)] [&_blockquote]:pl-3 [&_h1]:mb-2 [&_h1]:text-lg [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:font-semibold";
+
+const assistantTypingCursorClasses =
+  "[&>p:last-of-type]:after:ml-px [&>p:last-of-type]:after:inline-block [&>p:last-of-type]:after:animate-pulse [&>p:last-of-type]:after:content-['|'] [&>p:last-of-type]:after:text-[var(--text-primary)]";
+
+const markdownProseUser =
+  "[&_p]:mb-2 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_li]:my-0.5 [&_a]:text-blue-200 [&_a]:underline dark:[&_a]:text-blue-700 [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 dark:[&_code]:bg-black/10";
 
 interface ChatMessageProps {
   role: Role;
@@ -65,8 +76,12 @@ export function ChatMessage({
     >
       {isUser ? (
         <>
-          <div className="max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed whitespace-pre-wrap bg-[#0F111D] text-white dark:bg-white dark:text-[#0F0F10]">
-            {displayedContent}
+          <div
+            className={`max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed bg-[#0F111D] text-white dark:bg-white dark:text-[#0F0F10] ${markdownProseUser}`}
+          >
+            <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+              {displayedContent}
+            </ReactMarkdown>
           </div>
         </>
       ) : (
@@ -82,9 +97,16 @@ export function ChatMessage({
               />
             </div>
           )}
-          <div className="w-full text-[15px] leading-relaxed whitespace-pre-wrap text-[var(--text-primary)]">
-            {displayedContent}
-            {isAnimating && <span className="animate-pulse">|</span>}
+          <div
+            className={`w-full text-[15px] leading-relaxed text-[var(--text-primary)] ${markdownProseAssistant} ${isAnimating ? assistantTypingCursorClasses : ""}`}
+          >
+            {displayedContent === "" && isAnimating ? (
+              <span className="animate-pulse text-[var(--text-primary)]">|</span>
+            ) : (
+              <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+                {displayedContent}
+              </ReactMarkdown>
+            )}
           </div>
           {!isAnimating && (showInterviewerPrompt || (interviewerQuestions && interviewerQuestions.length > 0)) && (
             <div className="flex flex-col gap-2 items-end w-full mt-2">

@@ -25,19 +25,32 @@ const ICON_INSET = 12;
 const ICON_BTN = 40;
 const ICON_CENTER_XY = ICON_INSET + ICON_BTN / 2;
 
-const TEXT_IN_END = 0.5;
-const TEXT_OUT_START = 2.45;
-const TEXT_OUT_END = 3.05;
-const PARTICLE_OUT_START = 3.05;
-const PARTICLE_OUT_END = 3.7;
-const MAIN_REVEAL_AT = 3.2;
-const OVERLAY_OUT_START = 3.35;
-const OVERLAY_OUT_END = 4.15;
+/** 1문구: 담당자님… (유지 구간 0.5초 단축 → 인트로 전체 약 1초 단축) */
+const TEXT1_IN_END = 0.5;
+const TEXT1_OUT_START = 1.95;
+const TEXT1_OUT_END = 2.55;
+const TEXT1_HOLD = TEXT1_OUT_START - TEXT1_IN_END;
+const TEXT1_OUT_DURATION = TEXT1_OUT_END - TEXT1_OUT_START;
+
+/** 2문구: AYOUNG DESIGN PORTFOLIO — 페이드 인·아웃은 1문구와 동일, 완전 노출 유지만 1초 짧게 */
+const TEXT2_IN_START = TEXT1_OUT_END;
+const TEXT2_IN_END = TEXT2_IN_START + TEXT1_IN_END;
+const TEXT2_HOLD = Math.max(0.25, TEXT1_HOLD - 1);
+const TEXT2_OUT_START = TEXT2_IN_END + TEXT2_HOLD;
+const TEXT2_OUT_END = TEXT2_OUT_START + TEXT1_OUT_DURATION;
+
+/** 파티클·메인은 2문구가 완전히 사라진 뒤 기존과 같은 간격으로 진행 */
+const PARTICLE_OUT_START = TEXT2_OUT_END;
+const PARTICLE_OUT_END = TEXT2_OUT_END + (3.7 - 3.05);
+const MAIN_REVEAL_AT = TEXT2_OUT_END + (3.2 - 3.05);
+const OVERLAY_OUT_START = TEXT2_OUT_END + (3.35 - 3.05);
+const OVERLAY_OUT_END = TEXT2_OUT_END + (4.15 - 3.05);
 
 export function Intro({ onMainReveal, onComplete }: IntroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const textRef = useRef<HTMLParagraphElement>(null);
+  const text1Ref = useRef<HTMLParagraphElement>(null);
+  const text2Ref = useRef<HTMLParagraphElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
   const onCompleteRef = useRef(onComplete);
@@ -51,7 +64,8 @@ export function Intro({ onMainReveal, onComplete }: IntroProps) {
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
-    const textEl = textRef.current;
+    const text1El = text1Ref.current;
+    const text2El = text2Ref.current;
     const overlayEl = overlayRef.current;
     if (!container || !canvas) return;
 
@@ -153,25 +167,53 @@ export function Intro({ onMainReveal, onComplete }: IntroProps) {
         onMainRevealRef.current?.();
       }
 
-      if (textEl) {
-        if (t < TEXT_IN_END) {
-          const p = t / TEXT_IN_END;
-          const e = easeOutCubic(p);
-          textEl.style.opacity = String(e);
-          textEl.style.filter = `blur(${10 * (1 - e)}px)`;
-        } else if (t < TEXT_OUT_START) {
-          textEl.style.opacity = "1";
-          textEl.style.filter = "blur(0px)";
-        } else if (t < TEXT_OUT_END) {
-          const p = (t - TEXT_OUT_START) / (TEXT_OUT_END - TEXT_OUT_START);
-          const e = easeOutCubic(p);
-          textEl.style.opacity = String(1 - e);
-          textEl.style.filter = `blur(${12 * e}px)`;
-        } else {
-          textEl.style.opacity = "0";
-          textEl.style.filter = "blur(12px)";
+      const applyTextPhase = (
+        el: HTMLParagraphElement | null,
+        inEnd: number,
+        outStart: number,
+        outEnd: number,
+        phaseStart: number
+      ) => {
+        if (!el) return;
+        const local = t - phaseStart;
+        if (local < 0) {
+          el.style.opacity = "0";
+          el.style.filter = "blur(12px)";
+          return;
         }
-      }
+        if (local < inEnd) {
+          const p = local / inEnd;
+          const e = easeOutCubic(p);
+          el.style.opacity = String(e);
+          el.style.filter = `blur(${10 * (1 - e)}px)`;
+        } else if (local < outStart) {
+          el.style.opacity = "1";
+          el.style.filter = "blur(0px)";
+        } else if (local < outEnd) {
+          const p = (local - outStart) / (outEnd - outStart);
+          const e = easeOutCubic(p);
+          el.style.opacity = String(1 - e);
+          el.style.filter = `blur(${12 * e}px)`;
+        } else {
+          el.style.opacity = "0";
+          el.style.filter = "blur(12px)";
+        }
+      };
+
+      applyTextPhase(
+        text1El,
+        TEXT1_IN_END,
+        TEXT1_OUT_START,
+        TEXT1_OUT_END,
+        0
+      );
+      applyTextPhase(
+        text2El,
+        TEXT1_IN_END,
+        TEXT1_OUT_START,
+        TEXT1_OUT_END,
+        TEXT2_IN_START
+      );
 
       updateIconWorldTargets(0);
 
@@ -275,13 +317,23 @@ export function Intro({ onMainReveal, onComplete }: IntroProps) {
       <div ref={containerRef} className="pointer-events-none absolute inset-0">
         <canvas ref={canvasRef} className="h-full w-full" />
       </div>
-      <p
-        ref={textRef}
-        className="relative z-10 max-w-[min(90vw,28rem)] px-6 text-center text-[clamp(1.05rem,3.5vw,1.35rem)] font-medium leading-relaxed tracking-tight text-[#EAEAF0]"
-        style={{ opacity: 0, filter: "blur(12px)" }}
-      >
-        담당자님, 이쪽으로 모시겠습니다
-      </p>
+      <div className="relative z-10 flex min-h-[5rem] w-full max-w-[min(90vw,28rem)] items-center justify-center px-6">
+        <p
+          ref={text1Ref}
+          className="absolute inset-x-6 text-center text-[clamp(1.05rem,3.5vw,1.35rem)] font-medium leading-relaxed tracking-tight text-[#EAEAF0]"
+          style={{ opacity: 0, filter: "blur(12px)" }}
+        >
+          담당자님, 이쪽으로 모시겠습니다
+        </p>
+        <p
+          ref={text2Ref}
+          className="pointer-events-none absolute inset-x-6 text-center text-[clamp(0.8rem,2.8vw,1.05rem)] font-semibold leading-snug tracking-[0.12em] text-[#EAEAF0]"
+          style={{ opacity: 0, filter: "blur(12px)" }}
+          aria-hidden
+        >
+          AYOUNG DESIGN PORTFOLIO
+        </p>
+      </div>
     </div>
   );
 }
