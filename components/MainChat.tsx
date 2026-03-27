@@ -7,23 +7,7 @@ import { KeywordPills } from "./KeywordPills";
 import { WelcomeBlock } from "./WelcomeBlock";
 import type { KeywordPillId } from "@/lib/keywordPills";
 import type { Message } from "@/lib/chatHistory";
-
-const CHAT_HISTORY_STORAGE_KEY = "chat-history";
-
-/** 활성 채팅 = chat-history 배열의 첫 번째 항목 (addChatToHistory가 unshift) */
-function getActiveSessionIdFromStorage(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const history = JSON.parse(
-      localStorage.getItem(CHAT_HISTORY_STORAGE_KEY) || "[]"
-    ) as unknown;
-    if (!Array.isArray(history) || history.length === 0) return null;
-    const id = (history[0] as { id?: unknown })?.id;
-    return typeof id === "string" && id.length > 0 ? id : null;
-  } catch {
-    return null;
-  }
-}
+import { getOrCreateBrowserId } from "@/lib/browserId";
 
 interface MainChatProps {
   chatId?: string;
@@ -237,17 +221,13 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     setIsSubmitting(true);
 
     const outgoingMessages = [...messages, userMessage];
-    const sessionHeader =
-      getActiveSessionIdFromStorage() ??
-      chatId ??
-      `anon-${Date.now()}`;
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-session-id": sessionHeader,
+          "x-session-id": getOrCreateBrowserId(),
         },
         body: JSON.stringify({
           messages: outgoingMessages,

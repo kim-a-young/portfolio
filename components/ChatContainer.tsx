@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { getOrCreateBrowserId } from "@/lib/browserId";
 
 interface Message {
   role: "user" | "assistant";
@@ -30,17 +31,11 @@ export default function ChatContainer() {
     setIsLoading(true);
 
     try {
-      // 세션 ID 생성 (없으면 새로 만들어서 sessionStorage에 저장)
-      if (!localStorage.getItem("session_id")) {
-        localStorage.setItem("session_id", `session-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      }
-      const sessionId = localStorage.getItem("session_id") ?? `anon-${Date.now()}`;
-      
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "x-session-id": sessionId,
+          "x-session-id": getOrCreateBrowserId(),
         },
         body: JSON.stringify({
           messages: [...messages, userMessage],
