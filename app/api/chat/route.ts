@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";  
 import { NextRequest, NextResponse } from "next/server";
 import { getPortfolioKnowledgeForChat } from "@/lib/portfolio-projects";
 
@@ -140,7 +141,7 @@ const SYSTEM_PROMPT_BASE = `
   - 업무 범위를 제한하기보다, 결과를 위해 필요한 작업을 맡는 편
 
 [SKILLS]
-- 디자인툴:Figma, XD(선호툴), Photoshop, Illustrator
+- 디자인툴:Figma, XD(선호), Photoshop, Illustrator
 - 실무활용툴:After Effects, Nexacro
 - 협업툴: Slack, Zeplin
 - AI 활용
@@ -200,6 +201,22 @@ const CLOSING_STATEMENT_ONLY = `
 이번 답변만: 반드시 설명·정리·공감·협업 관찰 등 **평서문으로만** 끝낸다.
 끝에 추가 질문, 되묻기, "혹시 ~이 궁금하신가요" 류의 유도 문장을 붙이지 않는다.`;
 
+async function saveChatLog(userMessage: string, botResponse: string, sessionId: string) {
+  // 로컬 환경에서는 저장 안 함
+  if (process.env.NODE_ENV === "development") return;
+
+  try {
+    await supabase.from("chat_logs").insert([
+      {
+        user_message: userMessage,
+        bot_response: botResponse,
+        session_id: sessionId,
+      },
+    ]);
+  } catch (err) {
+    console.error("Supabase 저장 실패:", err);
+  }
+}
 function buildSystemPrompt(): string {
   const closing =
     Math.random() < 0.4 ? CLOSING_WITH_OPTIONAL_FOLLOWUP : CLOSING_STATEMENT_ONLY;
@@ -335,9 +352,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
-      message: assistantMessage,
-    });
+// 마지막 사용자 메시지 추출
+  const lastUserMessage = messages.filter(m => m.role === "user").pop()?.content ?? "";
+
+// 요청 헤더에서 세션 ID 가져오기 (없으면 임시 ID 생성)
+  const sessionId = request.headers.get("x-session-id") ?? `anon-${Date.now()}`;
+
+// Supabase에 대화 저장
+  await saveChatLog(lastUserMessage, assistantMessage, sessionId);
+
+return NextResponse.json({
+  message: assistantMessage,
+});
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("Chat API error:", error);

@@ -30,11 +30,20 @@ export default function ChatContainer() {
     setIsLoading(true);
 
     try {
+      // 세션 ID 생성 (없으면 새로 만들어서 sessionStorage에 저장)
+      if (!localStorage.getItem("session_id")) {
+        localStorage.setItem("session_id", `session-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      }
+      const sessionId = localStorage.getItem("session_id") ?? `anon-${Date.now()}`;
+      
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-session-id": sessionId,
+        },
         body: JSON.stringify({
-          messages: [...messages, userMessage], // 지금까지의 대화 내역을 보냄
+          messages: [...messages, userMessage],
         }),
       });
 
