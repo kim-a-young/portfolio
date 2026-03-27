@@ -112,7 +112,16 @@ body {
 }
 
 .menu-project-hint-pop {
-  animation: menu-hint-in 0.35s ease-out both;
+  animation: menu-hint-in 0.9s ease-out both;
+  transition:
+    opacity 1.2s ease-out,
+    transform 1.2s ease-out;
+}
+
+/* 등장 키프레임의 `from`과 대칭되게 천천히 물러나도록 */
+.menu-project-hint-pop.menu-project-hint-out {
+  opacity: 0;
+  transform: translateX(-4px) scale(0.98);
 }
 
 /* Hero 인사 문구 그라데이션 (서버/클라이언트 동일) */

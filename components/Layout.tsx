@@ -26,16 +26,42 @@ export function Layout({ mainEntered = true }: LayoutProps) {
   const chatHistory = useChatHistory();
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [showMenuProjectHint, setShowMenuProjectHint] = useState(false);
+  const [menuHintExiting, setMenuHintExiting] = useState(false);
   /** 새 채팅(저장 전)에서도 첫 요청부터 동일한 session id를 쓰기 위한 스레드 id */
   const newThreadSessionRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!mainEntered) return;
-    setShowMenuProjectHint(true);
-    const t = window.setTimeout(() => {
+    if (!mainEntered) {
       setShowMenuProjectHint(false);
-    }, 1700);
-    return () => window.clearTimeout(t);
+      setMenuHintExiting(false);
+      return;
+    }
+
+    /** CSS `menu-hint-in` / `menu-project-hint-out`과 동일 길이(ms) */
+    const HINT_DELAY_MS = 2000;
+    const FADE_IN_MS = 900;
+    const HOLD_MS = 1600;
+    const FADE_OUT_MS = 1200;
+
+    const showT = window.setTimeout(() => {
+      setShowMenuProjectHint(true);
+      setMenuHintExiting(false);
+    }, HINT_DELAY_MS);
+
+    const exitT = window.setTimeout(() => {
+      setMenuHintExiting(true);
+    }, HINT_DELAY_MS + FADE_IN_MS + HOLD_MS);
+
+    const hideT = window.setTimeout(() => {
+      setShowMenuProjectHint(false);
+      setMenuHintExiting(false);
+    }, HINT_DELAY_MS + FADE_IN_MS + HOLD_MS + FADE_OUT_MS);
+
+    return () => {
+      window.clearTimeout(showT);
+      window.clearTimeout(exitT);
+      window.clearTimeout(hideT);
+    };
   }, [mainEntered]);
 
   const ensureNewThreadSessionId = useCallback(() => {
@@ -153,7 +179,7 @@ export function Layout({ mainEntered = true }: LayoutProps) {
               <div
                 id="menu-project-hint"
                 role="status"
-                className="menu-project-hint-pop pointer-events-none relative max-w-[min(17rem,calc(100vw-5.5rem))] origin-left"
+                className={`menu-project-hint-pop pointer-events-none relative max-w-[min(17rem,calc(100vw-5.5rem))] origin-left ${menuHintExiting ? "menu-project-hint-out" : ""}`}
               >
                 <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--background)] px-3.5 py-2 text-sm leading-snug text-[var(--text-primary)] shadow-md">
                   <span
