@@ -224,6 +224,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-session-id": chatId ?? `anon-${Date.now()}`,
         },
         body: JSON.stringify({
           messages: [...messages, userMessage],
