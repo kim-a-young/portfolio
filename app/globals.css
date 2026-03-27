@@ -100,6 +100,21 @@ body {
 .stagger-4 { animation: fade-in-up 0.4s ease-out 0.18s forwards; opacity: 0; }
 .stagger-5 { animation: fade-in-up 0.4s ease-out 0.24s forwards; opacity: 0; }
 
+@keyframes menu-hint-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.menu-project-hint-pop {
+  animation: menu-hint-in 0.35s ease-out both;
+}
+
 /* Hero 인사 문구 그라데이션 (서버/클라이언트 동일) */
 .text-hero-gradient {
   background: linear-gradient(90deg, #D349FA 0%, #6E3CD0 100%);

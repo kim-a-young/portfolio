@@ -25,7 +25,7 @@ export default function Home() {
           pointerEvents: mainVisible ? "auto" : "none",
         }}
       >
-        <Layout />
+        <Layout mainEntered={mainVisible && !introMounted} />
       </div>
       {introMounted && (
         <Intro onMainReveal={handleMainReveal} onComplete={handleIntroComplete} />

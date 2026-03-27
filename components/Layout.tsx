@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { MainChat } from "./MainChat";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
@@ -14,14 +14,29 @@ import {
   type Message,
 } from "@/lib/chatHistory";
 
-export function Layout() {
+type LayoutProps = {
+  /** 인트로가 끝난 뒤 메인이 보일 때만 true — 이 시점에만 메뉴 힌트 표시 */
+  mainEntered?: boolean;
+};
+
+export function Layout({ mainEntered = true }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const chatHistory = useChatHistory();
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [showMenuProjectHint, setShowMenuProjectHint] = useState(false);
   /** 새 채팅(저장 전)에서도 첫 요청부터 동일한 session id를 쓰기 위한 스레드 id */
   const newThreadSessionRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!mainEntered) return;
+    setShowMenuProjectHint(true);
+    const t = window.setTimeout(() => {
+      setShowMenuProjectHint(false);
+    }, 1700);
+    return () => window.clearTimeout(t);
+  }, [mainEntered]);
 
   const ensureNewThreadSessionId = useCallback(() => {
     if (!newThreadSessionRef.current) {
@@ -110,12 +125,17 @@ export function Layout() {
       >
         <div className="fixed right-3 top-3 z-20 flex items-center gap-2">
           <ThemeToggle />
-          {!sidebarOpen && (
+        </div>
+        {!sidebarOpen && (
+          <div className="fixed left-3 top-3 z-50 flex items-center gap-2">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="fixed left-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--icon)] transition-colors hover:bg-[var(--subtle-gray)]"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--icon)] transition-colors hover:bg-[var(--subtle-gray)]"
               aria-label="메뉴 열기"
+              aria-describedby={
+                showMenuProjectHint ? "menu-project-hint" : undefined
+              }
             >
               <svg
                 width="20"
@@ -129,8 +149,25 @@ export function Layout() {
                 <path d="M3 6h18M3 12h18M3 18h18" />
               </svg>
             </button>
-          )}
-        </div>
+            {showMenuProjectHint && (
+              <div
+                id="menu-project-hint"
+                role="status"
+                className="menu-project-hint-pop pointer-events-none relative max-w-[min(17rem,calc(100vw-5.5rem))] origin-left"
+              >
+                <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--background)] px-3.5 py-2 text-sm leading-snug text-[var(--text-primary)] shadow-md">
+                  <span
+                    className="pointer-events-none absolute left-0 top-1/2 z-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-l border-[var(--border)] bg-[var(--background)]"
+                    aria-hidden
+                  />
+                  <span className="relative z-10 block">
+                    프로젝트도 볼 수 있어요!
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {selectedProject === "projects" ? (
           <ProjectView projectId={selectedProject} sidebarOpen={sidebarOpen} />
         ) : (
