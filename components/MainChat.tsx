@@ -342,6 +342,15 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     setLoadingQuestions((prev) => new Set(prev).add(assistantIndex));
 
     try {
+      /**
+       * 직전 사용자 질문이 **이 주제 스레드의 첫 질문**일 때만 true.
+       * (바로 위가 어시스턴트 답변이면 같은 주제를 이어 묻는 후속 질문 → false)
+       */
+      const idxBeforeUser = assistantIndex - 2;
+      const isFirstQuestionInTopic =
+        idxBeforeUser < 0 ||
+        messages[idxBeforeUser]?.role !== "assistant";
+
       const response = await fetch("/api/interviewer-questions", {
         method: "POST",
         headers: {
@@ -349,6 +358,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
         },
         body: JSON.stringify({
           messages: messages.slice(0, assistantIndex + 1), // 해당 답변까지의 대화 전달
+          isFirstQuestionInTopic,
         }),
       });
 
