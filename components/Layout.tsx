@@ -187,7 +187,7 @@ export function Layout({ mainEntered = true }: LayoutProps) {
                     aria-hidden
                   />
                   <span className="relative z-10 block">
-                    프로젝트도 볼 수 있어요!
+                    프로젝트 내용을 확인하세요
                   </span>
                 </div>
               </div>
