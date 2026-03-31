@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SYSTEM_PROMPT_SHARED = `
+const SYSTEM_PROMPT_HEAD = `
 너는 면접관에게 질문을 제안하는 AI야.
 
 상황:
 - 면접관이 아영님(시니어 UI/UX 디자이너)에 대해 질문하고 있음
 - 현재까지의 대화 맥락을 바탕으로 면접관이 물어볼 만한 질문 2개를 생성해야 함
+`;
 
+const PROMPT_Q2_BLOCK = `
 [질문2 — 항상 동일]
 - **질문2**: 질문1과 완전히 다른 카테고리.
   → 아래 중 하나를 고를 것:
@@ -15,7 +17,9 @@ const SYSTEM_PROMPT_SHARED = `
      개인 성향/취미, 우리 서비스와의 연결점
   → 단, 이미 대화에 나온 카테고리는 제외.
   → 파고드는 심화 질문 금지. 가볍게 넓은 주제를 여는 수준.
+`;
 
+const SYSTEM_PROMPT_TAIL = `
 [핵심 제약 — 반드시 지킬 것]
 - 아영님의 데이터(제공된 정보)에 존재하는 내용을 바탕으로만 질문 생성.
 - 데이터에 없는 내용을 추측하거나 상상해야 답할 수 있는 질문은 만들지 말 것.
@@ -23,8 +27,9 @@ const SYSTEM_PROMPT_SHARED = `
 - 가볍고 자연스러운 대화 톤
 
 형식:
-- JSON 배열 형식으로만 반환
-- 예: ["질문1", "질문2"]
+- JSON 배열 형식으로만 반환.
+- **배열 순서 고정: index 0 = 위 [질문1] 규칙에 맞는 문장, index 1 = 위 [질문2] 규칙에 맞는 문장. 순서를 바꾸거나 뒤집지 말 것.**
+- 예: ["질문1 규칙으로 쓴 문장", "질문2 규칙으로 쓴 문장"]
 `;
 
 const Q1_RULE_FIRST_IN_TOPIC = `
@@ -39,17 +44,19 @@ const Q1_RULE_FIRST_IN_TOPIC = `
 const Q1_RULE_SAME_TOPIC_FOLLOWUP = `
 [질문1 — 같은 주제에서 **어시스턴트 답 다음에 이어진** 사용자 질문에 대한 말풍선일 때]
 - 직전 턴에 이미 사용자 질문 → 답변이 있었고, 지금은 그 **후속** 질문에 대한 답변인 경우.
-- 같은 프로젝트나 경험을 더 파고드는 질문은 금지.
+- 질문은 이미 대화에서 잡힌 **카테고리**(예: 특정 프로젝트, 직무/역할 한 축, 프로필·경력의 한 덩어리) **안**의 주제로 할 것.
+- 대화에 없던 **전혀 다른 프로젝트·경험**으로 새 장을 여는 질문은 하지 말 것.
+- 같은 프로젝트·경험을 **더 파고드는** 질문은 금지.
   → "왜", "어떻게", "더 구체적으로" 같은 심화 질문 절대 금지.
-  → 같은 주제의 다른 측면(예: 성과→느낀점, 어려움→배운점)으로 살짝 옮기는 것도 금지.
-  → 아직 언급되지 않은 새로운 경험이나 정보를 여는 질문이어야 함.
+- 카테고리 안에서는 답에서 깊게 다루지 않은 **가벼운 옆선·소주제**로 옮기는 정도는 허용 (철학·가치관 심화나 단계별 쪼개기 금지).
 `;
 
 function buildSystemPrompt(isFirstQuestionInTopic: boolean): string {
   const q1 = isFirstQuestionInTopic ? Q1_RULE_FIRST_IN_TOPIC : Q1_RULE_SAME_TOPIC_FOLLOWUP;
-  return `${SYSTEM_PROMPT_SHARED}
+  return `${SYSTEM_PROMPT_HEAD}
 ${q1}
-`;
+${PROMPT_Q2_BLOCK}
+${SYSTEM_PROMPT_TAIL}`;
 }
 
 export async function POST(request: NextRequest) {

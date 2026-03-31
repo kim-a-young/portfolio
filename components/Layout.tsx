@@ -37,8 +37,8 @@ export function Layout({ mainEntered = true }: LayoutProps) {
       return;
     }
 
-    /** CSS `menu-hint-in` / `menu-project-hint-out`과 동일 길이(ms) */
-    const HINT_DELAY_MS = 2000;
+    /** 말풍선 최초 등장까지 지연. 페이드 길이는 globals `menu-hint-in` / `menu-project-hint-out`과 맞춤 */
+    const HINT_DELAY_MS = 1200;
     const FADE_IN_MS = 900;
     const HOLD_MS = 1600;
     const FADE_OUT_MS = 1200;

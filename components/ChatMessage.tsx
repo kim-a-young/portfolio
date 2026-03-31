@@ -8,10 +8,19 @@ import remarkBreaks from "remark-breaks";
 type Role = "user" | "assistant";
 
 const markdownProseAssistant =
-  "[&_p]:mt-0 [&_p]:mb-0 [&_p]:leading-relaxed [&_p:not(:last-child)]:mb-[1.625em] [&_strong]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_li]:my-0.5 [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-[var(--subtle-gray)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.9em] [&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-[var(--subtle-gray)] [&_pre]:p-3 [&_blockquote]:my-2 [&_blockquote]:border-l-2 [&_blockquote]:border-[var(--border)] [&_blockquote]:pl-3 [&_h1]:mb-2 [&_h1]:text-lg [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:font-semibold";
+  "[&_p]:mt-0 [&_p]:mb-0 [&_p]:leading-[1.78] [&_p:not(:last-child)]:mb-[1.85em] [&_p]:text-pretty [&_strong]:font-semibold [&_ul]:my-2.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:leading-[1.72] [&_ol]:my-2.5 [&_ol]:list-decimal [&_ol]:leading-[1.72] [&_li]:my-1 [&_li]:pl-0.5 [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-[var(--subtle-gray)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.9em] [&_pre]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-[var(--subtle-gray)] [&_pre]:p-3 [&_blockquote]:my-3 [&_blockquote]:border-l-2 [&_blockquote]:border-[var(--border)] [&_blockquote]:pl-3 [&_blockquote]:leading-[1.72] [&_h1]:mb-2 [&_h1]:text-lg [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:font-semibold";
 
-const assistantTypingCursorClasses =
-  "[&>p:last-of-type]:after:ml-px [&>p:last-of-type]:after:inline-block [&>p:last-of-type]:after:animate-pulse [&>p:last-of-type]:after:content-['|'] [&>p:last-of-type]:after:text-[var(--text-primary)]";
+/** 방금 출력한 문자 뒤, 다음 글자까지 대기(ms) — 문단 경계는 더 길게 */
+function delayMsAfterChar(ch: string, nextChar: string | undefined): number {
+  if (ch === "\n") {
+    if (nextChar === "\n") return 78;
+    return 58;
+  }
+  if (/[.!?。．？…]/.test(ch)) return 48;
+  if (/[,，、;:]/.test(ch)) return 30;
+  if (ch === " " || ch === "\t") return 14;
+  return 25;
+}
 
 const markdownProseUser =
   "[&_p]:mb-2 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_li]:my-0.5 [&_a]:text-blue-200 [&_a]:underline dark:[&_a]:text-blue-700 [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 dark:[&_code]:bg-black/10";
@@ -49,19 +58,37 @@ export function ChatMessage({
     if (isTyping && !isUser) {
       setIsAnimating(true);
       setDisplayedContent("");
-      let currentIndex = 0;
-      
-      const typingInterval = setInterval(() => {
-        if (currentIndex < content.length) {
-          setDisplayedContent(content.slice(0, currentIndex + 1));
-          currentIndex++;
-        } else {
-          clearInterval(typingInterval);
-          setIsAnimating(false);
-        }
-      }, 20); // 20ms마다 한 글자씩 (조절 가능)
+      if (content.length === 0) {
+        setIsAnimating(false);
+        return;
+      }
 
-      return () => clearInterval(typingInterval);
+      let i = 0;
+      let cancelled = false;
+      let timeoutId: ReturnType<typeof setTimeout>;
+
+      const tick = () => {
+        if (cancelled) return;
+        if (i >= content.length) {
+          setIsAnimating(false);
+          return;
+        }
+        i += 1;
+        setDisplayedContent(content.slice(0, i));
+        if (i >= content.length) {
+          setIsAnimating(false);
+          return;
+        }
+        const chJustShown = content[i - 1];
+        const delay = delayMsAfterChar(chJustShown, content[i]);
+        timeoutId = setTimeout(tick, delay);
+      };
+
+      timeoutId = setTimeout(tick, 18);
+      return () => {
+        cancelled = true;
+        clearTimeout(timeoutId);
+      };
     } else {
       setDisplayedContent(content);
       setIsAnimating(false);
@@ -98,10 +125,12 @@ export function ChatMessage({
             </div>
           )}
           <div
-            className={`w-full text-[15px] leading-relaxed text-[var(--text-primary)] ${markdownProseAssistant} ${isAnimating ? assistantTypingCursorClasses : ""}`}
+            className={`w-full text-[15px] leading-[1.78] tracking-[-0.01em] text-[var(--text-primary)] antialiased ${markdownProseAssistant} ${isAnimating ? "chat-typing-cursor-prose" : ""}`}
           >
             {displayedContent === "" && isAnimating ? (
-              <span className="animate-pulse text-[var(--text-primary)]">|</span>
+              <span className="chat-typing-cursor-mark font-light text-[var(--text-primary)]">
+                |
+              </span>
             ) : (
               <ReactMarkdown remarkPlugins={[remarkBreaks]}>
                 {displayedContent}

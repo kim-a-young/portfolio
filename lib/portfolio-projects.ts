@@ -281,8 +281,47 @@ export const PROJECTS: ProjectItem[] = [
   },
 ];
 
+/**
+ * 프로젝트 메뉴(리스트)에는 노출하지 않지만, 채팅 LLM 컨텍스트에는 포함할 경험.
+ * 답변 시 사실로 인용 가능. 사용자에게는「프로젝트 메뉴에서 보기」로 안내하지 말 것.
+ */
+const CHAT_ONLY_PORTFOLIO_KNOWLEDGE_BLOCKS: {
+  title: string;
+  meta?: string;
+  designTypes?: string;
+  tools?: string;
+  description: string;
+}[] = [
+  {
+    title:
+      "AVCS·다중 비행장 원격 관제 UX 제안 (항공정보포털 AirPortal과 별도 · UI 카드 미노출)",
+    meta: "데이터 · 관제 / 제안",
+    designTypes:
+      "Control System UX, Real-time Data Visualization, Information Hierarchy, Proposal",
+    tools: "Tool : Figma, XD, Photoshop, Illustrator",
+    description: `항공정보포털(AirPortal)과는 별도 프로젝트로, AVCS(공항 에어사이드 차량통제 관제시스템)와 다중 비행장 원격 관제 제안 과정에 참여하였습니다.
+
+방대한 실시간 데이터나 복잡한 정보 사이의 위계를 정립하고, 사용자가 지금 당장 판단해야 할 정보를 중심으로 시각화하는 설계에 집중하였습니다.`,
+  },
+];
+
+function formatChatOnlyKnowledgeBlock(block: (typeof CHAT_ONLY_PORTFOLIO_KNOWLEDGE_BLOCKS)[number]): string {
+  const lines: string[] = [`[비리스트·LLM용] ${block.title}`];
+  if (block.meta) lines.push(`유형: ${block.meta}`);
+  if (block.designTypes?.trim()) {
+    lines.push(`Design 범위: ${block.designTypes}`);
+  }
+  if (block.tools?.trim()) lines.push(block.tools);
+  lines.push("상세 설명:");
+  lines.push(block.description.trim());
+  lines.push(
+    "안내: 이 항목은 포트폴리오 화면의 프로젝트 카드 목록에 없음. 사용자에게 프로젝트 메뉴에서 해당 카드를 찾도록 유도하지 말 것."
+  );
+  return lines.join("\n");
+}
+
 export function getPortfolioKnowledgeForChat(): string {
-  return PROJECTS.map((p) => {
+  const fromList = PROJECTS.map((p) => {
     const lines: string[] = [`[${p.id}] ${p.name}`];
     if (p.meta) lines.push(`유형: ${p.meta}`);
     if (p.detailDesignTypes?.trim()) {
@@ -302,4 +341,10 @@ export function getPortfolioKnowledgeForChat(): string {
     }
     return lines.join("\n");
   }).join("\n\n---\n\n");
+
+  const chatOnly = CHAT_ONLY_PORTFOLIO_KNOWLEDGE_BLOCKS.map(
+    formatChatOnlyKnowledgeBlock
+  ).join("\n\n---\n\n");
+
+  return `${fromList}\n\n---\n\n${chatOnly}`;
 }

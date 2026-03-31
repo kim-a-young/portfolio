@@ -45,7 +45,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     }
   }, [chatId, initialMessages.length]);
 
-  // 35초 타이머: 마지막 어시스턴트 메시지 완료 후 35초 경과 시 해당 어시스턴트 메시지에 "음...그..." 버튼 표시
+  // 10초 타이머: 마지막 어시스턴트 메시지 완료 후 10초 경과 시 해당 어시스턴트 메시지에 "음...그..." 버튼 표시
   useEffect(() => {
     // 타이머 초기화
     if (timerRef.current) {
@@ -68,7 +68,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
       
       timerRef.current = setTimeout(() => {
         setAssistantMessageWithPrompt(lastAssistantIndex);
-      }, 35000); // 35초
+      }, 10000); // 10초
     }
 
     return () => {
@@ -237,8 +237,14 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
       if (!response.ok) {
         let errorMessage = "Failed to get response from API";
         try {
-          const errorData = await response.json();
+          const errorData = (await response.json()) as {
+            error?: string;
+            detail?: string;
+          };
           errorMessage = errorData.error || errorMessage;
+          if (typeof errorData.detail === "string" && errorData.detail) {
+            console.error("[/api/chat detail]", errorData.detail);
+          }
         } catch {
           errorMessage = `API error: ${response.status} ${response.statusText}`;
         }
@@ -517,7 +523,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                   value={input}
                   onChange={handleInputChange}
                   onSubmit={handleFormSubmit}
-                  placeholder="아영님에 대한 정보 수집을 도와드려요! 뭐든 물어보세요..."
+                  placeholder="함께 일해 본 동료 AI가 뭐든 대답해드려요"
                   disabled={isSubmitting}
                   compact={true}
                 />

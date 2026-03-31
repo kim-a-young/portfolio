@@ -140,3 +140,88 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Spline 인트로: 씬 전체가 부드럽게 초점이 맞춰지듯 등장 (iframe 내부 UI는 건드리지 않음) */
+@keyframes intro-spline-reveal {
+  0% {
+    opacity: 0;
+    filter: blur(22px) brightness(0.65);
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes intro-spline-vignette-fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.intro-spline-stage {
+  animation: intro-spline-reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center center;
+}
+
+.intro-spline-vignette {
+  background: radial-gradient(
+    ellipse 72% 58% at 50% 48%,
+    transparent 0%,
+    transparent 45%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  animation: intro-spline-vignette-fade 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-spline-stage {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+
+  .intro-spline-vignette {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* 어시스턴트 타이핑 커서: pulse보다 완만한 밝기 변화 */
+@keyframes chat-typing-cursor {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.chat-typing-cursor-mark {
+  animation: chat-typing-cursor 1.15s ease-in-out infinite;
+}
+
+.chat-typing-cursor-prose > p:last-of-type::after {
+  margin-left: 1px;
+  display: inline-block;
+  content: "|";
+  color: var(--text-primary);
+  font-weight: 300;
+  animation: chat-typing-cursor 1.15s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-typing-cursor-mark,
+  .chat-typing-cursor-prose > p:last-of-type::after {
+    animation: none;
+    opacity: 0.55;
+  }
+}

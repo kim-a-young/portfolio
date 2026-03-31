@@ -52,7 +52,7 @@ export function WelcomeBlock({
             value={input}
             onChange={onInputChange}
             onSubmit={onSubmit}
-            placeholder="아영님에 대한 정보 수집을 도와드려요! 뭐든 물어보세요..."
+            placeholder="함께 일해 본 동료 AI가 뭐든 대답해드려요"
             disabled={isSubmitting}
           />
         </div>
