@@ -29,40 +29,71 @@ export function Layout({ mainEntered = true }: LayoutProps) {
   const [menuHintExiting, setMenuHintExiting] = useState(false);
   /** 새 채팅(저장 전)에서도 첫 요청부터 동일한 session id를 쓰기 위한 스레드 id */
   const newThreadSessionRef = useRef<string | null>(null);
+  const menuHintShowTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const menuHintExitTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
 
   useEffect(() => {
     if (!mainEntered) {
+      if (menuHintShowTimerRef.current) {
+        window.clearTimeout(menuHintShowTimerRef.current);
+        menuHintShowTimerRef.current = null;
+      }
+      if (menuHintExitTimerRef.current) {
+        window.clearTimeout(menuHintExitTimerRef.current);
+        menuHintExitTimerRef.current = null;
+      }
       setShowMenuProjectHint(false);
       setMenuHintExiting(false);
       return;
     }
 
-    /** 말풍선 최초 등장까지 지연. 페이드 길이는 globals `menu-hint-in` / `menu-project-hint-out`과 맞춤 */
+    /** 말풍선 최초 등장까지 지연. 등장 애니는 globals `menu-hint-in` / 퇴장은 `menu-project-hint-out`과 맞춤 */
     const HINT_DELAY_MS = 1200;
-    const FADE_IN_MS = 900;
-    const HOLD_MS = 1600;
-    const FADE_OUT_MS = 1200;
-
-    const showT = window.setTimeout(() => {
+    menuHintShowTimerRef.current = window.setTimeout(() => {
+      menuHintShowTimerRef.current = null;
       setShowMenuProjectHint(true);
       setMenuHintExiting(false);
     }, HINT_DELAY_MS);
 
-    const exitT = window.setTimeout(() => {
-      setMenuHintExiting(true);
-    }, HINT_DELAY_MS + FADE_IN_MS + HOLD_MS);
-
-    const hideT = window.setTimeout(() => {
-      setShowMenuProjectHint(false);
-      setMenuHintExiting(false);
-    }, HINT_DELAY_MS + FADE_IN_MS + HOLD_MS + FADE_OUT_MS);
-
     return () => {
-      window.clearTimeout(showT);
-      window.clearTimeout(exitT);
-      window.clearTimeout(hideT);
+      if (menuHintShowTimerRef.current) {
+        window.clearTimeout(menuHintShowTimerRef.current);
+        menuHintShowTimerRef.current = null;
+      }
+      if (menuHintExitTimerRef.current) {
+        window.clearTimeout(menuHintExitTimerRef.current);
+        menuHintExitTimerRef.current = null;
+      }
     };
   }, [mainEntered]);
+
+  /** 메뉴(햄버거) 클릭 시에만 말풍선을 닫음 — 자동 숨김 없음 */
+  const FADE_OUT_MATCH_CSS_MS = 1200;
+
+  const handleOpenMenu = useCallback(() => {
+    setSidebarOpen(true);
+
+    if (menuHintShowTimerRef.current) {
+      window.clearTimeout(menuHintShowTimerRef.current);
+      menuHintShowTimerRef.current = null;
+    }
+
+    setShowMenuProjectHint((wasShown) => {
+      if (!wasShown) return wasShown;
+      requestAnimationFrame(() => {
+        setMenuHintExiting(true);
+        if (menuHintExitTimerRef.current) {
+          window.clearTimeout(menuHintExitTimerRef.current);
+        }
+        menuHintExitTimerRef.current = window.setTimeout(() => {
+          menuHintExitTimerRef.current = null;
+          setShowMenuProjectHint(false);
+          setMenuHintExiting(false);
+        }, FADE_OUT_MATCH_CSS_MS);
+      });
+      return wasShown;
+    });
+  }, []);
 
   const ensureNewThreadSessionId = useCallback(() => {
     if (!newThreadSessionRef.current) {
@@ -156,7 +187,7 @@ export function Layout({ mainEntered = true }: LayoutProps) {
           <div className="fixed left-3 top-3 z-50 flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setSidebarOpen(true)}
+              onClick={handleOpenMenu}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--icon)] transition-colors hover:bg-[var(--subtle-gray)]"
               aria-label="메뉴 열기"
               aria-describedby={
