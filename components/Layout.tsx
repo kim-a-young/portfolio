@@ -29,8 +29,8 @@ export function Layout({ mainEntered = true }: LayoutProps) {
   const [menuHintExiting, setMenuHintExiting] = useState(false);
   /** 새 채팅(저장 전)에서도 첫 요청부터 동일한 session id를 쓰기 위한 스레드 id */
   const newThreadSessionRef = useRef<string | null>(null);
-  const menuHintShowTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
-  const menuHintExitTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const menuHintShowTimerRef = useRef<number | null>(null);
+  const menuHintExitTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!mainEntered) {

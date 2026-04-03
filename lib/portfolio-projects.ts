@@ -6,10 +6,19 @@ export type ProjectItem = {
   accent: string;
   meta?: string;
   detailImage?: string;
+  /** 있으면 상세 본문은 줄바꿈 대신 이 배열로만 나뉨(배포 번들에서도 문단 경계가 고정됨) */
+  detailParagraphs?: string[];
   detailDesignTypes?: string;
   detailTools?: string;
   detailDescription?: string;
 };
+
+const HERZION_DETAIL_PARAGRAPHS = [
+  "퇴행성 뇌질환 예방을 위한 음향진동 케어 디바이스의 전용 앱 ‘헤르지온’은 웰니스 서비스로서 사용자에게 안정감과 신뢰를 전달하는 경험 설계가 중요한 프로젝트였습니다. 특히 비전문가와 중장년층 사용자도 쉽게 사용할 수 있도록 단순하고 직관적인 구조 설계가 주요 과제로 주어졌습니다.",
+  "서비스 구조를 단순화하고, 사용 목적에 따라 쉽게 선택할 수 있는 흐름으로 UI를 구성하였습니다. 또한 헤르지온만의 아이덴티티를 전달할 수 있도록 캐릭터를 기획 및 디자인하고, 서비스 전반에 일관되게 적용하였습니다.",
+  "디바이스와의 연결 경험에서는 인터렉션과 애니메이션을 활용하여 사용자에게 자연스럽고 연결감 있는 경험으로 확장하였습니다.",
+  "그 결과, 앱과 홍보 영상 전반에 활용 가능한 브랜딩 기반을 구축하였으며, 신규 헬스케어 디바이스 전용 앱 수주 및 디자인 수행으로 이어지며 서비스 확장에 기여하였습니다.",
+] as const;
 
 export const PROJECTS: ProjectItem[] = [
   {
@@ -74,13 +83,8 @@ export const PROJECTS: ProjectItem[] = [
     meta: "앱 · 구축",
     detailDesignTypes: "UI/UX Design 100%, Brand Identity, Character Design, Motion Graphic Design",
     detailTools: "Tool : XD, Photoshop, Illustrator, After Effects",
-    detailDescription: `퇴행성 뇌질환 예방을 위한 음향진동 케어 디바이스의 전용 앱 ‘헤르지온’은 웰니스 서비스로서 사용자에게 안정감과 신뢰를 전달하는 경험 설계가 중요한 프로젝트였습니다. 특히 비전문가와 중장년층 사용자도 쉽게 사용할 수 있도록 단순하고 직관적인 구조 설계가 주요 과제로 주어졌습니다.
-
-서비스 구조를 단순화하고, 사용 목적에 따라 쉽게 선택할 수 있는 흐름으로 UI를 구성하였습니다. 또한 헤르지온만의 아이덴티티를 전달할 수 있도록 캐릭터를 기획 및 디자인하고, 서비스 전반에 일관되게 적용하였습니다.
-
-디바이스와의 연결 경험에서는 인터렉션과 애니메이션을 활용하여 사용자에게 자연스럽고 연결감 있는 경험으로 확장하였습니다.
-
-그 결과, 앱과 홍보 영상 전반에 활용 가능한 브랜딩 기반을 구축하였으며, 신규 헬스케어 디바이스 전용 앱 수주 및 디자인 수행으로 이어지며 서비스 확장에 기여하였습니다.`,
+    detailParagraphs: [...HERZION_DETAIL_PARAGRAPHS],
+    detailDescription: HERZION_DETAIL_PARAGRAPHS.join("\n\n"),
   },
   {
     id: 5,
@@ -332,7 +336,9 @@ export function getPortfolioKnowledgeForChat(): string {
     if (p.detailTools?.trim()) {
       lines.push(p.detailTools);
     }
-    const body = p.detailDescription?.trim();
+    const body =
+      p.detailDescription?.trim() ||
+      p.detailParagraphs?.map((t) => t.trim()).filter(Boolean).join("\n\n");
     if (body) {
       lines.push("상세 설명:");
       lines.push(body);

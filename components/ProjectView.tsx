@@ -11,10 +11,13 @@ interface ProjectViewProps {
 
 function projectHasDetailWriteup(project: ProjectItem): boolean {
   const body = project.detailDescription?.trim() ?? "";
+  const hasParagraphs = Boolean(
+    project.detailParagraphs?.some((p) => p.trim().length > 0)
+  );
   const hasCustomMeta = Boolean(
     project.detailDesignTypes?.trim() || project.detailTools?.trim()
   );
-  return Boolean(body) || hasCustomMeta;
+  return Boolean(body) || hasParagraphs || hasCustomMeta;
 }
 
 function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
@@ -22,16 +25,29 @@ function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
   const hasCustomMeta = Boolean(
     project.detailDesignTypes?.trim() || project.detailTools?.trim()
   );
-  if (!rawBody && !hasCustomMeta) return null;
+  if (
+    !rawBody &&
+    !(project.detailParagraphs?.some((p) => p.trim().length > 0)) &&
+    !hasCustomMeta
+  ) {
+    return null;
+  }
 
   const designTypes =
     project.detailDesignTypes ?? "Reactive Design, UI/UX Design";
   const toolsLine =
     project.detailTools ?? "Tool : Figma, XD, Photoshop, Illustrator";
-  const paragraphs = rawBody
-    .split(/\n\s*\n/)
-    .map((p) => p.trim())
-    .filter(Boolean);
+  const fromArray =
+    project.detailParagraphs
+      ?.map((p) => p.trim())
+      .filter(Boolean) ?? [];
+  const paragraphs =
+    fromArray.length > 0
+      ? fromArray
+      : rawBody
+          .split(/\n\s*\n/)
+          .map((p) => p.trim())
+          .filter(Boolean);
 
   const leftColumn = (
     <div className="min-w-0 md:max-w-[25vw]">

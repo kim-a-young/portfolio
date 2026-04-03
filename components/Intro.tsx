@@ -28,9 +28,9 @@ function easeOutCubic(t: number): number {
 }
 
 /** 인트로만의 타이밍 (본문 노출·오버레이 해제). 문구 애니메이션 없음 */
-const MAIN_REVEAL_AT_S = 1.6;
-const OVERLAY_FADE_START_S = 1.75;
-const OVERLAY_FADE_END_S = 2.45;
+const MAIN_REVEAL_AT_S = 2.0;
+const OVERLAY_FADE_START_S = 2.15;
+const OVERLAY_FADE_END_S = 2.85;
 
 export function Intro({ onMainReveal, onComplete }: IntroProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
