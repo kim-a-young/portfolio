@@ -165,7 +165,7 @@ body {
 }
 
 .intro-spline-stage {
-  animation: intro-spline-reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: intro-spline-reveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform-origin: center center;
 }
 
@@ -176,7 +176,7 @@ body {
     transparent 45%,
     rgba(0, 0, 0, 0.5) 100%
   );
-  animation: intro-spline-vignette-fade 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+  animation: intro-spline-vignette-fade 1.35s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
   opacity: 1;
 }
 
