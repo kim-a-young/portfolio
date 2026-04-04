@@ -24,6 +24,10 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
   const [assistantMessageWithPrompt, setAssistantMessageWithPrompt] = useState<number | null>(null);
   const [expandedPrompts, setExpandedPrompts] = useState<Set<number>>(new Set());
   const [loadingQuestions, setLoadingQuestions] = useState<Set<number>>(new Set());
+  /** SSE로 답변이 오고 있는 어시스턴트 메시지 인덱스 */
+  const [streamingAssistantIndex, setStreamingAssistantIndex] = useState<number | null>(null);
+  /** SSE 종료 후에도 gptLike 따라가기 애니가 끝날 때까지 타이머·스크롤 유지 */
+  const [assistantRevealBusyIndex, setAssistantRevealBusyIndex] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const lastScrollTopRef = useRef<number>(0);
@@ -58,12 +62,15 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     // 마지막 메시지가 어시스턴트 메시지이고, 타이핑이 완료되었고, 제출 중이 아닐 때만 타이머 시작
     const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
     const isTypingComplete = typingMessageIndex === null;
-    
+    const streamIdle =
+      streamingAssistantIndex === null && assistantRevealBusyIndex === null;
+
     if (
       messages.length > 0 &&
       lastMessage?.role === "assistant" &&
       !isSubmitting &&
-      isTypingComplete
+      isTypingComplete &&
+      streamIdle
     ) {
       // 마지막 어시스턴트 메시지의 인덱스
       const lastAssistantIndex = messages.length - 1;
@@ -79,7 +86,13 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages.length, isSubmitting, typingMessageIndex]);
+  }, [
+    messages.length,
+    isSubmitting,
+    typingMessageIndex,
+    streamingAssistantIndex,
+    assistantRevealBusyIndex,
+  ]);
 
   const hasMessages = messages.length > 0;
 
@@ -147,11 +160,23 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     scrollToLatest();
     // 스크롤 후 사용자가 위로 스크롤 중이었던 상태 리셋
     isUserScrollingUpRef.current = false;
-  }, [messages.length, isSubmitting, typingMessageIndex, messages]);
+  }, [
+    messages.length,
+    isSubmitting,
+    typingMessageIndex,
+    streamingAssistantIndex,
+    assistantRevealBusyIndex,
+    messages,
+  ]);
 
-  // 타이핑 애니메이션 중에도 스크롤이 따라가도록
+  // 타이핑·SSE 수신 중에도 스크롤이 따라가도록
   useEffect(() => {
-    if (typingMessageIndex !== null && !isUserScrollingUpRef.current) {
+    if (
+      (typingMessageIndex !== null ||
+        streamingAssistantIndex !== null ||
+        assistantRevealBusyIndex !== null) &&
+      !isUserScrollingUpRef.current
+    ) {
       const scrollInterval = setInterval(() => {
         if (isUserScrollingUpRef.current) {
           clearInterval(scrollInterval);
@@ -178,7 +203,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
 
       return () => clearInterval(scrollInterval);
     }
-  }, [typingMessageIndex]);
+  }, [typingMessageIndex, streamingAssistantIndex, assistantRevealBusyIndex]);
 
   const handleSubmit = async (
     questionText?: string,
@@ -223,7 +248,15 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     setIsSubmitting(true);
 
     const outgoingMessages = [...messages, userMessage];
+    const assistantIndex = updatedMessages.length;
 
+    const assistantShell: Message = {
+      role: "assistant",
+      content: "",
+      ...(showProfilePhotoWithReply ? { showProfilePhoto: true } : {}),
+    };
+
+    let streamFinishedOk = false;
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -233,6 +266,8 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
         },
         body: JSON.stringify({ messages: outgoingMessages }),
       });
+
+      const contentType = response.headers.get("content-type") ?? "";
 
       if (!response.ok) {
         let errorMessage = "Failed to get response from API";
@@ -251,38 +286,126 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
         throw new Error(errorMessage);
       }
 
-      const data = await response.json();
-      
-      if (!data.message) {
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        throw new Error("Invalid response format");
+      if (!contentType.includes("text/event-stream")) {
+        throw new Error("스트리밍 응답이 아닙니다. 서버를 확인해 주세요.");
       }
-      
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: data.message,
-        ...(showProfilePhotoWithReply ? { showProfilePhoto: true } : {}),
-      };
-      const newMessages = [...updatedMessages, assistantMessage];
-      setMessages(newMessages);
-      setTypingMessageIndex(newMessages.length - 1);
+
+      setMessages([...updatedMessages, assistantShell]);
+      setStreamingAssistantIndex(assistantIndex);
+      setAssistantRevealBusyIndex(assistantIndex);
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error("응답 본문을 읽을 수 없습니다.");
+      }
+
+      const decoder = new TextDecoder();
+      let sseBuffer = "";
+      let streamDone = false;
+
+      outer: while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        sseBuffer += decoder.decode(value, { stream: true });
+
+        let nl: number;
+        while ((nl = sseBuffer.indexOf("\n")) >= 0) {
+          const line = sseBuffer.slice(0, nl).trim();
+          sseBuffer = sseBuffer.slice(nl + 1);
+          if (!line.startsWith("data:")) continue;
+          const raw = line.slice(5).trim();
+          if (!raw) continue;
+
+          try {
+            const payload = JSON.parse(raw) as { delta?: string; done?: boolean };
+            if (typeof payload.delta === "string" && payload.delta.length > 0) {
+              setMessages((prev) => {
+                const next = [...prev];
+                const m = next[assistantIndex];
+                if (m?.role === "assistant") {
+                  next[assistantIndex] = {
+                    ...m,
+                    content: m.content + payload.delta,
+                  };
+                }
+                return next;
+              });
+            }
+            if (payload.done === true) {
+              streamDone = true;
+              break outer;
+            }
+          } catch {
+            /* 한 줄 파싱 실패는 건너뜀 */
+          }
+        }
+      }
+
+      reader.releaseLock();
+
+      if (!streamDone) {
+        console.warn("[/api/chat] stream ended without done flag");
+      }
+
+      setMessages((prev) => {
+        const next = [...prev];
+        const m = next[assistantIndex];
+        if (m?.role === "assistant" && m.content.trim() === "") {
+          next[assistantIndex] = {
+            ...m,
+            content: "죄송합니다. 답변을 받지 못했습니다. 다시 시도해 주세요.",
+          };
+        }
+        const out = next;
+        queueMicrotask(() => onMessagesChange?.(out));
+        return out;
+      });
+
+      setTimeout(() => {
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const hasScroll = scrollHeight > clientHeight;
+        if (hasScroll) {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            window.scrollTo({
+              top: document.documentElement.scrollHeight - clientHeight,
+              behavior: "smooth",
+            });
+          }
+        } else if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+      }, 100);
+      streamFinishedOk = true;
     } catch (error) {
       console.error("Error calling chat API:", error);
-      const errorContent = error instanceof Error 
-        ? `죄송합니다. 오류가 발생했습니다: ${error.message}` 
-        : "죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.";
-      const errorMessage: Message = {
-        role: "assistant",
-        content: errorContent,
-      };
-      const errorMessages = [...updatedMessages, errorMessage];
-      setMessages(errorMessages);
-      // 에러 메시지도 완료된 후 히스토리 저장
-      onMessagesChange?.(errorMessages);
+      const errorContent =
+        error instanceof Error
+          ? `죄송합니다. 오류가 발생했습니다: ${error.message}`
+          : "죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.";
+      setMessages((prev) => {
+        const next = [...prev];
+        const m = next[assistantIndex];
+        if (m?.role === "assistant") {
+          next[assistantIndex] = { ...m, content: errorContent };
+        } else {
+          next.push({
+            role: "assistant",
+            content: errorContent,
+            ...(showProfilePhotoWithReply ? { showProfilePhoto: true } : {}),
+          });
+        }
+        queueMicrotask(() => onMessagesChange?.(next));
+        return next;
+      });
     } finally {
+      setStreamingAssistantIndex(null);
       setIsSubmitting(false);
+      if (!streamFinishedOk) {
+        setAssistantRevealBusyIndex(null);
+      }
     }
   };
 
@@ -465,6 +588,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                         msg.role === "assistant" ? msg.showProfilePhoto === true : false
                       }
                       isTyping={typingMessageIndex === i && msg.role === "assistant"}
+                      isStreaming={streamingAssistantIndex === i && msg.role === "assistant"}
                       interviewerQuestions={isAssistantMessage ? msg.interviewerQuestions : undefined}
                       showInterviewerPrompt={showPrompt}
                       isLoadingQuestions={isLoading}
@@ -472,8 +596,11 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                       onInterviewerPromptClick={isAssistantMessage ? () => handleInterviewerPromptClick(i) : undefined}
                       onQuestionClick={(question) => handleQuestionClick(question)}
                       onAssistantStreamComplete={
-                        typingMessageIndex === i && msg.role === "assistant"
+                        msg.role === "assistant"
                           ? () => {
+                              setAssistantRevealBusyIndex((prev) =>
+                                prev === i ? null : prev
+                              );
                               setTypingMessageIndex(null);
                               queueMicrotask(() => {
                                 onMessagesChange?.(messagesRef.current);
@@ -503,7 +630,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                   </div>
                 );
               })}
-              {isSubmitting && (
+              {isSubmitting && streamingAssistantIndex === null && (
                 <div className="flex justify-start" role="status" aria-live="polite">
                   <div className="rounded-2xl bg-[var(--subtle-gray)] px-4 py-3 text-[var(--text-secondary)] animate-pulse">
                     답변을 작성하고 있어요...

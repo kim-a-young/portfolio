@@ -260,10 +260,15 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/** 일시적 네트워크 오류 대비 재시도. 성공 시 Response 반환(HTTP 4xx/5xx 포함). */
-async function fetchOpenAIChatCompletion(
+/** 스트리밍 왕복. 연결 실패 시에만 재시도(본문 소비 전). */
+async function openAIChatStreamWithRetry(
   apiKey: string,
-  payload: { model: string; messages: unknown[]; temperature: number }
+  payload: {
+    model: string;
+    messages: unknown[];
+    temperature: number;
+    max_tokens?: number;
+  }
 ): Promise<Response> {
   let lastError: unknown;
   for (let attempt = 1; attempt <= OPENAI_FETCH_MAX_ATTEMPTS; attempt++) {
@@ -274,13 +279,13 @@ async function fetchOpenAIChatCompletion(
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, stream: true }),
         signal: AbortSignal.timeout(OPENAI_FETCH_TIMEOUT_MS),
       });
     } catch (err) {
       lastError = err;
       console.error(
-        `OpenAI fetch failed (attempt ${attempt}/${OPENAI_FETCH_MAX_ATTEMPTS}):`,
+        `OpenAI stream fetch failed (attempt ${attempt}/${OPENAI_FETCH_MAX_ATTEMPTS}):`,
         err
       );
       if (attempt < OPENAI_FETCH_MAX_ATTEMPTS) {
@@ -332,12 +337,18 @@ export async function POST(request: NextRequest) {
       ...messages,
     ];
 
-    let response: Response;
+    const lastUserMessage =
+      messages.filter((m) => m.role === "user").pop()?.content ?? "";
+    const sessionId =
+      request.headers.get("x-session-id") ?? `anon-${Date.now()}`;
+
+    let upstream: Response;
     try {
-      response = await fetchOpenAIChatCompletion(apiKey, {
+      upstream = await openAIChatStreamWithRetry(apiKey, {
         model: "gpt-4o-mini",
         messages: chatMessages,
         temperature: 0.7,
+        max_tokens: 600,
       });
     } catch (fetchErr) {
       const msg =
@@ -352,64 +363,134 @@ export async function POST(request: NextRequest) {
             ? "AI 응답 대기 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요."
             : "AI 서버에 연결하지 못했습니다. 네트워크·VPN·방화벽과 .env.local 의 OPENAI_API_KEY 를 확인해 주세요.",
           detail:
-            process.env.NODE_ENV === "development"
-              ? msg
-              : undefined,
+            process.env.NODE_ENV === "development" ? msg : undefined,
         },
         { status: 503 }
       );
     }
 
-    if (!response.ok) {
+    if (!upstream.ok) {
       let errorMessage = "OpenAI API error";
       try {
-        const errorData = await response.json();
-        errorMessage = errorData.error?.message || errorData.error || errorMessage;
+        const errText = await upstream.text();
+        const errorData = JSON.parse(errText) as {
+          error?: { message?: string } | string;
+        };
+        errorMessage =
+          (typeof errorData.error === "object" && errorData.error?.message) ||
+          (typeof errorData.error === "string" ? errorData.error : null) ||
+          errorMessage;
       } catch {
-        errorMessage = `OpenAI API error: ${response.status} ${response.statusText}`;
+        errorMessage = `OpenAI API error: ${upstream.status} ${upstream.statusText}`;
       }
       console.error("OpenAI API error:", errorMessage);
       return NextResponse.json(
         { error: errorMessage },
-        { status: response.status >= 500 ? 502 : response.status }
+        { status: upstream.status >= 500 ? 502 : upstream.status }
       );
     }
 
-    let data: {
-      choices?: Array<{ message?: { content?: string | null } }>;
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    let fullText = "";
+    let upstreamBuffer = "";
+    let logSaved = false;
+
+    const saveOnce = async () => {
+      if (logSaved || !fullText.trim()) return;
+      logSaved = true;
+      await saveChatLog(lastUserMessage, fullText, sessionId);
     };
-    try {
-      data = await response.json();
-    } catch (parseErr) {
-      console.error("OpenAI response JSON parse failed:", parseErr);
-      return NextResponse.json(
-        { error: "AI 응답을 해석하지 못했습니다." },
-        { status: 502 }
-      );
-    }
 
-    const assistantMessage = data.choices?.[0]?.message?.content;
+    const outStream = new ReadableStream({
+      async start(controller) {
+        const body = upstream.body;
+        if (!body) {
+          controller.error(new Error("No response body"));
+          return;
+        }
+        const reader = body.getReader();
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            upstreamBuffer += decoder.decode(value, { stream: true });
 
-    if (assistantMessage == null || assistantMessage === "") {
-      console.error("No message content in OpenAI response:", data);
-      return NextResponse.json(
-        { error: "No response from AI" },
-        { status: 500 }
-      );
-    }
+            let newline: number;
+            while ((newline = upstreamBuffer.indexOf("\n")) >= 0) {
+              const line = upstreamBuffer.slice(0, newline).trim();
+              upstreamBuffer = upstreamBuffer.slice(newline + 1);
 
-// 마지막 사용자 메시지 추출
-  const lastUserMessage = messages.filter(m => m.role === "user").pop()?.content ?? "";
+              if (!line.startsWith("data:")) continue;
+              const raw = line.slice(5).trim();
+              if (!raw) continue;
+              if (raw === "[DONE]") {
+                await saveOnce();
+                continue;
+              }
+              try {
+                const chunk = JSON.parse(raw) as {
+                  choices?: Array<{ delta?: { content?: string } }>;
+                };
+                const delta = chunk.choices?.[0]?.delta?.content ?? "";
+                if (delta) {
+                  fullText += delta;
+                  controller.enqueue(
+                    encoder.encode(
+                      `data: ${JSON.stringify({ delta })}\n\n`
+                    )
+                  );
+                }
+              } catch {
+                // 무시: 파싱 불가 줄
+              }
+            }
+          }
 
-// 요청 헤더에서 세션 ID 가져오기 (없으면 임시 ID 생성)
-  const sessionId = request.headers.get("x-session-id") ?? `anon-${Date.now()}`;
+          const tail = upstreamBuffer.trim();
+          if (tail.startsWith("data:")) {
+            const raw = tail.slice(5).trim();
+            if (raw && raw !== "[DONE]") {
+              try {
+                const chunk = JSON.parse(raw) as {
+                  choices?: Array<{ delta?: { content?: string } }>;
+                };
+                const delta = chunk.choices?.[0]?.delta?.content ?? "";
+                if (delta) {
+                  fullText += delta;
+                  controller.enqueue(
+                    encoder.encode(`data: ${JSON.stringify({ delta })}\n\n`)
+                  );
+                }
+              } catch {
+                //
+              }
+            }
+          }
 
-// Supabase에 대화 저장
-  await saveChatLog(lastUserMessage, assistantMessage, sessionId);
+          await saveOnce();
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`)
+          );
+          controller.close();
+        } catch (e) {
+          console.error("Stream pipe error:", e);
+          controller.error(
+            e instanceof Error ? e : new Error(String(e))
+          );
+        } finally {
+          reader.releaseLock();
+        }
+      },
+    });
 
-return NextResponse.json({
-  message: assistantMessage,
-});
+    return new Response(outStream, {
+      headers: {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+      },
+    });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("Chat API error:", error);

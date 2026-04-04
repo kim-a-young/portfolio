@@ -24,6 +24,8 @@ interface ChatMessageProps {
   content: string;
   showProfilePhoto?: boolean;
   isTyping?: boolean;
+  /** API SSE로 본문이 실시간 수신 중 */
+  isStreaming?: boolean;
   interviewerQuestions?: string[];
   showInterviewerPrompt?: boolean;
   isLoadingQuestions?: boolean;
@@ -39,6 +41,7 @@ export function ChatMessage({
   content,
   showProfilePhoto = false,
   isTyping = false,
+  isStreaming = false,
   interviewerQuestions,
   showInterviewerPrompt = false,
   isLoadingQuestions = false,
@@ -52,11 +55,21 @@ export function ChatMessage({
   const [isAnimating, setIsAnimating] = useState(false);
   const onStreamCompleteRef = useRef(onAssistantStreamComplete);
   const streamGenRef = useRef(0);
+  const streamRevealGenRef = useRef(0);
+  const everStreamedAssistantRef = useRef(false);
+  if (isStreaming) everStreamedAssistantRef.current = true;
+  const contentRef = useRef(content);
+  contentRef.current = content;
+  const displayedAssistantRef = useRef(displayedContent);
+  displayedAssistantRef.current = displayedContent;
+  const isStreamingRef = useRef(isStreaming);
+  isStreamingRef.current = isStreaming;
 
   useEffect(() => {
     onStreamCompleteRef.current = onAssistantStreamComplete;
   }, [onAssistantStreamComplete]);
 
+  /** 히스토리·사용자 메시지: 즉시 반영. SSE 어시스턴트는 아래 reveal 루프만 사용 */
   useEffect(() => {
     if (isTyping && !isUser) {
       const gen = ++streamGenRef.current;
@@ -104,11 +117,85 @@ export function ChatMessage({
       };
     }
 
-    queueMicrotask(() => {
-      setDisplayedContent(content);
-      setIsAnimating(false);
-    });
-  }, [content, isTyping, isUser]);
+    if (isUser) {
+      queueMicrotask(() => {
+        setDisplayedContent(content);
+        setIsAnimating(false);
+      });
+      return;
+    }
+
+    if (!everStreamedAssistantRef.current && !isStreaming) {
+      queueMicrotask(() => {
+        setDisplayedContent(content);
+        setIsAnimating(false);
+      });
+    }
+  }, [content, isTyping, isUser, isStreaming]);
+
+  /** SSE 수신·마무리: `content`는 ref로 읽고, 표시는 기존 gptLike 청크 속도로 따라감 */
+  useEffect(() => {
+    if (isUser || isTyping) return;
+    if (!everStreamedAssistantRef.current && !isStreaming) return;
+
+    const gen = ++streamRevealGenRef.current;
+    let cancelled = false;
+    let initialDelayDone = false;
+
+    const run = async () => {
+      while (!cancelled && gen === streamRevealGenRef.current) {
+        const target = contentRef.current;
+        const streaming = isStreamingRef.current;
+        let d = displayedAssistantRef.current;
+
+        if (target.length === 0) {
+          if (!streaming) {
+            setDisplayedContent("");
+            setIsAnimating(false);
+            return;
+          }
+          await cancellableSleep(48, () => cancelled || gen !== streamRevealGenRef.current);
+          continue;
+        }
+
+        if (d.length >= target.length) {
+          if (!streaming) {
+            setIsAnimating(false);
+            onStreamCompleteRef.current?.();
+            return;
+          }
+          await cancellableSleep(48, () => cancelled || gen !== streamRevealGenRef.current);
+          continue;
+        }
+
+        setIsAnimating(true);
+        if (d.length === 0 && !initialDelayDone) {
+          await cancellableSleep(gptLikeInitialDelayMs(), () => cancelled || gen !== streamRevealGenRef.current);
+          if (cancelled || gen !== streamRevealGenRef.current) return;
+          initialDelayDone = true;
+          d = displayedAssistantRef.current;
+        }
+
+        const chunkSize = gptLikeChunkCharCount();
+        const next = Math.min(d.length + chunkSize, target.length);
+        const chunk = target.slice(d.length, next);
+        d = target.slice(0, next);
+        displayedAssistantRef.current = d;
+        setDisplayedContent(d);
+
+        if (next < target.length || streaming) {
+          const delay = gptLikeDelayAfterChunk(chunk);
+          await cancellableSleep(delay, () => cancelled || gen !== streamRevealGenRef.current);
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isUser, isTyping]);
 
   return (
     <div
