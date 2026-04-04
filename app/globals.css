@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* 다크모드: data-theme로 토글, 없으면 시스템 설정 따름 */
+/* 다크모드: data-theme로 토글. 미설정 시 기본은 라이트(스크립트·ThemeProvider와 동일) */
 @custom-variant dark {
   &:where([data-theme="dark"], [data-theme="dark"] *) {
     @slot;

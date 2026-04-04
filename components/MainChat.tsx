@@ -28,6 +28,8 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const lastScrollTopRef = useRef<number>(0);
   const isUserScrollingUpRef = useRef<boolean>(false);
+  const messagesRef = useRef<Message[]>(messages);
+  messagesRef.current = messages;
 
   // 초기 메시지가 변경되면 동기화
   useEffect(() => {
@@ -229,9 +231,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
           "Content-Type": "application/json",
           "x-session-id": getOrCreateBrowserId(),
         },
-        body: JSON.stringify({
-          messages: outgoingMessages,
-        }),
+        body: JSON.stringify({ messages: outgoingMessages }),
       });
 
       if (!response.ok) {
@@ -267,32 +267,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
       };
       const newMessages = [...updatedMessages, assistantMessage];
       setMessages(newMessages);
-      // 타이핑 애니메이션 시작
       setTypingMessageIndex(newMessages.length - 1);
-      // 어시스턴트 메시지가 완료된 후에만 히스토리 저장
-      // 타이핑 애니메이션이 완료된 후 저장하도록 약간의 지연 추가
-      setTimeout(() => {
-        onMessagesChange?.(newMessages);
-        setTypingMessageIndex(null);
-        // 타이핑 완료 후 스크롤 처리
-        setTimeout(() => {
-          const scrollHeight = document.documentElement.scrollHeight;
-          const clientHeight = document.documentElement.clientHeight;
-          const hasScroll = scrollHeight > clientHeight;
-
-          if (hasScroll) {
-            if (messagesEndRef.current) {
-              messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-            } else {
-              window.scrollTo({ top: document.documentElement.scrollHeight - clientHeight, behavior: "smooth" });
-            }
-          } else {
-            if (messagesEndRef.current) {
-              messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-            }
-          }
-        }, 100);
-      }, data.message.length * 20 + 500); // 타이핑 시간 + 여유 시간
     } catch (error) {
       console.error("Error calling chat API:", error);
       const errorContent = error instanceof Error 
@@ -448,8 +423,8 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
   };
 
   return (
-    <main className="flex min-h-screen flex-col bg-[var(--main-bg)]">
-      <div className="mx-auto flex w-full max-w-[768px] flex-col px-4 pb-[30px] pt-[30px] md:pt-[30px]">
+    <main className="flex min-h-svh flex-col bg-[var(--main-bg)]">
+      <div className="mx-auto flex min-h-0 w-full max-w-[768px] flex-1 flex-col px-4 pb-[30px] pt-[30px]">
         {!hasMessages ? (
           <WelcomeBlock
             input={input}
@@ -496,6 +471,34 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                       isPromptExpanded={isExpanded}
                       onInterviewerPromptClick={isAssistantMessage ? () => handleInterviewerPromptClick(i) : undefined}
                       onQuestionClick={(question) => handleQuestionClick(question)}
+                      onAssistantStreamComplete={
+                        typingMessageIndex === i && msg.role === "assistant"
+                          ? () => {
+                              setTypingMessageIndex(null);
+                              queueMicrotask(() => {
+                                onMessagesChange?.(messagesRef.current);
+                              });
+                              setTimeout(() => {
+                                const scrollHeight = document.documentElement.scrollHeight;
+                                const clientHeight = document.documentElement.clientHeight;
+                                const hasScroll = scrollHeight > clientHeight;
+
+                                if (hasScroll) {
+                                  if (messagesEndRef.current) {
+                                    messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+                                  } else {
+                                    window.scrollTo({
+                                      top: document.documentElement.scrollHeight - clientHeight,
+                                      behavior: "smooth",
+                                    });
+                                  }
+                                } else if (messagesEndRef.current) {
+                                  messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+                                }
+                              }, 100);
+                            }
+                          : undefined
+                      }
                     />
                   </div>
                 );
@@ -523,7 +526,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                   value={input}
                   onChange={handleInputChange}
                   onSubmit={handleFormSubmit}
-                  placeholder="함께 일해 본 동료 AI가 뭐든 대답해드려요"
+                  placeholder="함께 일해 본 동료 AI가 뭐든 대답해 드려요"
                   disabled={isSubmitting}
                   compact={true}
                 />

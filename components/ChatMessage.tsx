@@ -1,26 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import {
+  cancellableSleep,
+  gptLikeDelayAfterChunk,
+  gptLikeInitialDelayMs,
+  gptLikeChunkCharCount,
+} from "@/lib/chatStreamChunks";
 
 type Role = "user" | "assistant";
 
 const markdownProseAssistant =
   "[&_p]:mt-0 [&_p]:mb-0 [&_p]:leading-[1.78] [&_p:not(:last-child)]:mb-[1.85em] [&_p]:text-pretty [&_strong]:font-semibold [&_ul]:my-2.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:leading-[1.72] [&_ol]:my-2.5 [&_ol]:list-decimal [&_ol]:leading-[1.72] [&_li]:my-1 [&_li]:pl-0.5 [&_a]:underline [&_a]:underline-offset-2 [&_code]:rounded [&_code]:bg-[var(--subtle-gray)] [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.9em] [&_pre]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-[var(--subtle-gray)] [&_pre]:p-3 [&_blockquote]:my-3 [&_blockquote]:border-l-2 [&_blockquote]:border-[var(--border)] [&_blockquote]:pl-3 [&_blockquote]:leading-[1.72] [&_h1]:mb-2 [&_h1]:text-lg [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:font-semibold";
-
-/** 방금 출력한 문자 뒤, 다음 글자까지 대기(ms) — 문단 경계는 더 길게 */
-function delayMsAfterChar(ch: string, nextChar: string | undefined): number {
-  if (ch === "\n") {
-    if (nextChar === "\n") return 78;
-    return 58;
-  }
-  if (/[.!?。．？…]/.test(ch)) return 48;
-  if (/[,，、;:]/.test(ch)) return 30;
-  if (ch === " " || ch === "\t") return 14;
-  return 25;
-}
 
 const markdownProseUser =
   "[&_p]:mb-2 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_li]:my-0.5 [&_a]:text-blue-200 [&_a]:underline dark:[&_a]:text-blue-700 [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 dark:[&_code]:bg-black/10";
@@ -36,6 +30,8 @@ interface ChatMessageProps {
   isPromptExpanded?: boolean;
   onInterviewerPromptClick?: () => void;
   onQuestionClick?: (question: string) => void;
+  /** Full text is already in `content`; called once when chunk stream animation finishes */
+  onAssistantStreamComplete?: () => void;
 }
 
 export function ChatMessage({
@@ -49,50 +45,69 @@ export function ChatMessage({
   isPromptExpanded = false,
   onInterviewerPromptClick,
   onQuestionClick,
+  onAssistantStreamComplete,
 }: ChatMessageProps) {
   const isUser = role === "user";
   const [displayedContent, setDisplayedContent] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
+  const onStreamCompleteRef = useRef(onAssistantStreamComplete);
+  const streamGenRef = useRef(0);
+
+  useEffect(() => {
+    onStreamCompleteRef.current = onAssistantStreamComplete;
+  }, [onAssistantStreamComplete]);
 
   useEffect(() => {
     if (isTyping && !isUser) {
-      setIsAnimating(true);
-      setDisplayedContent("");
-      if (content.length === 0) {
-        setIsAnimating(false);
-        return;
-      }
-
-      let i = 0;
+      const gen = ++streamGenRef.current;
       let cancelled = false;
-      let timeoutId: ReturnType<typeof setTimeout>;
+      const runTyping = async () => {
+        if (cancelled || gen !== streamGenRef.current) return;
+        setIsAnimating(true);
+        setDisplayedContent("");
+        if (content.length === 0) {
+          setIsAnimating(false);
+          onStreamCompleteRef.current?.();
+          return;
+        }
 
-      const tick = () => {
-        if (cancelled) return;
-        if (i >= content.length) {
-          setIsAnimating(false);
-          return;
+        await cancellableSleep(gptLikeInitialDelayMs(), () => cancelled || gen !== streamGenRef.current);
+
+        let i = 0;
+        while (i < content.length) {
+          if (cancelled || gen !== streamGenRef.current) return;
+          const chunkSize = gptLikeChunkCharCount();
+          const next = Math.min(i + chunkSize, content.length);
+          const chunk = content.slice(i, next);
+          i = next;
+          setDisplayedContent(content.slice(0, i));
+
+          if (i >= content.length) break;
+
+          const delay = gptLikeDelayAfterChunk(chunk);
+          await cancellableSleep(delay, () => cancelled || gen !== streamGenRef.current);
         }
-        i += 1;
-        setDisplayedContent(content.slice(0, i));
-        if (i >= content.length) {
-          setIsAnimating(false);
-          return;
-        }
-        const chJustShown = content[i - 1];
-        const delay = delayMsAfterChar(chJustShown, content[i]);
-        timeoutId = setTimeout(tick, delay);
+
+        if (cancelled || gen !== streamGenRef.current) return;
+        setDisplayedContent(content);
+        setIsAnimating(false);
+        onStreamCompleteRef.current?.();
       };
 
-      timeoutId = setTimeout(tick, 18);
+      const kickoffId = setTimeout(() => {
+        void runTyping();
+      }, 0);
+
       return () => {
         cancelled = true;
-        clearTimeout(timeoutId);
+        clearTimeout(kickoffId);
       };
-    } else {
+    }
+
+    queueMicrotask(() => {
       setDisplayedContent(content);
       setIsAnimating(false);
-    }
+    });
   }, [content, isTyping, isUser]);
 
   return (

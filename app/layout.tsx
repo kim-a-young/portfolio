@@ -12,8 +12,9 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "아영님 소개 | 지원자 정보 수집",
-  description: "지원자 아영님에 대한 정보를 질문하고 답변받는 소개용 AI",
+  title: "디자이너 김아영 | 정보 수집 | 포트폴리오",
+  description:
+    "디자이너 김아영 포트폴리오·정보 수집용 AI 챗 — 프로젝트와 지원 정보를 질문하고 답변을 받을 수 있습니다.",
 };
 
 export default function RootLayout({
@@ -22,11 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning data-theme="light">
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);else if(window.matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.setAttribute("data-theme","dark");else document.documentElement.setAttribute("data-theme","light");})();`,
+            __html: `(function(){var t=localStorage.getItem("theme");if(t==="dark"||t==="light"||t==="system"){var r=t==="system"?(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):t;document.documentElement.setAttribute("data-theme",r);}else document.documentElement.setAttribute("data-theme","light");})();`,
           }}
         />
       </head>

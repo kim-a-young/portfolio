@@ -24,7 +24,7 @@ export function ChatInput({
   value,
   onChange,
   onSubmit,
-  placeholder = "함께 일해 본 동료 AI가 뭐든 대답해드려요",
+  placeholder = "함께 일해 본 동료 AI가 뭐든 대답해 드려요",
   disabled = false,
   "aria-label": ariaLabel = "질문 입력",
   compact = false,

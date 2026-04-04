@@ -31,10 +31,14 @@ export function WelcomeBlock({
   const stagger4 = "stagger-4";
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-0 -translate-y-6 md:-translate-y-8">
       <div className="flex w-full max-w-[768px] flex-col gap-[40px] pb-[60px]">
-        <div className={`${stagger} h-[90px] pt-[35px]`}>
-          <HeroAnimation />
+        <div
+          className={`${stagger} mb-2 flex h-[90px] items-start justify-center pt-[30px] md:pt-[32px]`}
+        >
+          <div className="-translate-y-2">
+            <HeroAnimation />
+          </div>
         </div>
         <h1
           className={`flex flex-col items-center justify-start text-left text-xl font-bold leading-snug tracking-tight text-[var(--text-primary)] md:text-2xl ${stagger2}`}
@@ -43,8 +47,8 @@ export function WelcomeBlock({
           <Greeting />
           <br />
           <span className="text-[var(--text-primary)]">
-            <span className="font-bold text-hero-gradient">지원자 아영님</span>
-            에 대해 알아가볼까요?
+            <span className="font-bold text-hero-gradient">아영님</span>
+            에 대해 궁금하신 점이 있으신가요?
           </span>
         </h1>
         <div className={`w-full ${stagger3}`}>
@@ -52,7 +56,7 @@ export function WelcomeBlock({
             value={input}
             onChange={onInputChange}
             onSubmit={onSubmit}
-            placeholder="함께 일해 본 동료 AI가 뭐든 대답해드려요"
+            placeholder="함께 일해 본 동료 AI가 뭐든 대답해 드려요"
             disabled={isSubmitting}
           />
         </div>

@@ -27,8 +27,8 @@ export function Layout({ mainEntered = true }: LayoutProps) {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [showMenuProjectHint, setShowMenuProjectHint] = useState(false);
   const [menuHintExiting, setMenuHintExiting] = useState(false);
-  /** 새 채팅(저장 전)에서도 첫 요청부터 동일한 session id를 쓰기 위한 스레드 id */
-  const newThreadSessionRef = useRef<string | null>(null);
+  /** 저장되지 않은 새 스레드용 id — MainChat chatId와 첫 저장 시 동일해야 함 */
+  const [draftThreadId, setDraftThreadId] = useState(() => `chat-${Date.now()}`);
   const menuHintShowTimerRef = useRef<number | null>(null);
   const menuHintExitTimerRef = useRef<number | null>(null);
 
@@ -42,8 +42,10 @@ export function Layout({ mainEntered = true }: LayoutProps) {
         window.clearTimeout(menuHintExitTimerRef.current);
         menuHintExitTimerRef.current = null;
       }
-      setShowMenuProjectHint(false);
-      setMenuHintExiting(false);
+      queueMicrotask(() => {
+        setShowMenuProjectHint(false);
+        setMenuHintExiting(false);
+      });
       return;
     }
 
@@ -95,18 +97,11 @@ export function Layout({ mainEntered = true }: LayoutProps) {
     });
   }, []);
 
-  const ensureNewThreadSessionId = useCallback(() => {
-    if (!newThreadSessionRef.current) {
-      newThreadSessionRef.current = `chat-${Date.now()}`;
-    }
-    return newThreadSessionRef.current;
-  }, []);
-
-  const effectiveChatId = currentChatId ?? ensureNewThreadSessionId();
+  const effectiveChatId = currentChatId ?? draftThreadId;
 
   const handleNewChat = useCallback(() => {
     setSelectedProject(null);
-    newThreadSessionRef.current = `chat-${Date.now()}`;
+    setDraftThreadId(`chat-${Date.now()}`);
     setCurrentChatId(null);
     setMessages([]);
   }, []);
@@ -114,7 +109,6 @@ export function Layout({ mainEntered = true }: LayoutProps) {
   const handleSelectChat = useCallback((chatId: string) => {
     const chat = getChatHistory().find((c) => c.id === chatId);
     if (chat) {
-      newThreadSessionRef.current = null;
       setCurrentChatId(chat.id);
       setMessages(chat.messages);
       setSelectedProject(null);
@@ -138,7 +132,7 @@ export function Layout({ mainEntered = true }: LayoutProps) {
       if (newMessages.length === 0) return;
 
       const now = Date.now();
-      const chatIdToUse = currentChatId || `chat-${now}`;
+      const chatIdToUse = currentChatId ?? draftThreadId;
 
       if (!currentChatId) {
         setCurrentChatId(chatIdToUse);
@@ -159,7 +153,7 @@ export function Layout({ mainEntered = true }: LayoutProps) {
         addChatToHistory(chat);
       })();
     },
-    [currentChatId]
+    [currentChatId, draftThreadId]
   );
 
   return (
