@@ -12,7 +12,7 @@ export default async function HappyHabitPage({
       <div className="mx-auto flex w-full max-w-none flex-col px-4 pb-[60px] pt-[40px]">
         <header className="mb-8 flex items-center justify-between">
           <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
-            SK 해피해빗 앱 리뉴얼
+            SKT 해피해빗 앱 리뉴얼
           </h1>
           <Link
             href="/"
@@ -25,7 +25,7 @@ export default async function HappyHabitPage({
         <div className="flex justify-center overflow-auto">
           <Image
             src="/images/pf_happyhabit.png"
-            alt="SK 해피해빗 앱 리뉴얼 상세 화면"
+            alt="SKT 해피해빗 앱 리뉴얼 상세 화면"
             width={800}
             height={800}
             className="h-auto w-auto max-w-none"

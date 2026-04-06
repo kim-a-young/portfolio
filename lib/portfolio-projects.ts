@@ -41,7 +41,7 @@ export const PROJECTS: ProjectItem[] = [
   },
   {
     id: 2,
-    name: "SK 해피해빗 앱 리뉴얼",
+    name: "SKT 해피해빗 앱 리뉴얼",
     url: "#",
     image: "/images/pf_happyhabit_m.png",
     accent: "#f97316", // 오렌지
