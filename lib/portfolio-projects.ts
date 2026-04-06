@@ -41,7 +41,7 @@ export const PROJECTS: ProjectItem[] = [
   },
   {
     id: 2,
-    name: "해피해빗 앱 리뉴얼",
+    name: "SK 해피해빗 앱 리뉴얼",
     url: "#",
     image: "/images/pf_happyhabit_m.png",
     accent: "#f97316", // 오렌지
@@ -59,7 +59,7 @@ export const PROJECTS: ProjectItem[] = [
   },
   {
     id: 3,
-    name: "레드커넥트 앱 고도화",
+    name: "대한적십자 헌혈앱 고도화",
     url: "#",
     image: "/images/pf_redconnect_m.png",
     accent: "#dc2626", // 레드
@@ -199,7 +199,7 @@ export const PROJECTS: ProjectItem[] = [
   },
   {
     id: 13,
-    name: "SK엔카 사업관리시스템 구축",
+    name: "SK엔카 ERP 구축",
     url: "#",
     image: "/images/pf_skncar_m.png",
     accent: "#ea580c", // 오렌지 (기존 다크 브라운보다 밝게, 다른 프로젝트 톤과 맞춤)
@@ -238,7 +238,7 @@ export const PROJECTS: ProjectItem[] = [
   },
   {
     id: 14,
-    name: "한국스마트카드 사업관리시스템 구축",
+    name: "한국스마트카드 ERP 구축",
     url: "#",
     image: "/images/pf_tmoney_m.png",
     accent: "#898989", // RGB 137,137,137 (hover 배경 고정)

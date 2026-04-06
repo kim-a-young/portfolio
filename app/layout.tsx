@@ -17,11 +17,15 @@ export const metadata: Metadata = {
     "디자이너 김아영 포트폴리오·정보 수집용 AI 챗 — 프로젝트와 지원 정보를 질문하고 답변을 받을 수 있습니다.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  /** Next.js 15+ — 동적 API는 Promise. unwrap하지 않으면 직렬화 시 경고가 난다. */
+  params: Promise<Record<string, string | string[] | undefined>>;
 }>) {
+  await params;
   return (
     <html lang="ko" suppressHydrationWarning data-theme="light">
       <head>
