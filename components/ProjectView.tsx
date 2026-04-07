@@ -631,22 +631,22 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
               </button>
             </div>
 
-            <div className="w-full py-8 pl-2 pr-4 sm:pl-3 sm:pr-5 md:pl-4 md:pr-6 bg-transparent">
-              <div className="mb-4 max-w-5xl">
-                <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">
-                  PROJECT DETAIL
-                </p>
-                <h2 className="mt-2 text-lg font-semibold text-white">
-                  {openProject.name}
-                </h2>
-                {openProject.meta && (
-                  <p className="mt-1 text-xs text-zinc-400">
-                    {openProject.meta}
-                  </p>
-                )}
-              </div>
-
+            <div className="w-full bg-transparent px-4 py-8 sm:px-6 md:px-8">
               <div className="mx-auto w-full max-w-[1440px]">
+                <div className="mb-4">
+                  <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">
+                    PROJECT DETAIL
+                  </p>
+                  <h2 className="mt-2 text-lg font-semibold text-white">
+                    {openProject.name}
+                  </h2>
+                  {openProject.meta && (
+                    <p className="mt-1 text-xs text-zinc-400">
+                      {openProject.meta}
+                    </p>
+                  )}
+                </div>
+
                 <Image
                   src={`${
                     openProject.detailImage ?? openProject.image
@@ -658,12 +658,12 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
                   priority
                   unoptimized
                 />
-              </div>
 
-              {!openProject.detailImage &&
-                projectHasDetailWriteup(openProject) && (
-                  <ProjectDetailDescriptionBlock project={openProject} />
-                )}
+                {!openProject.detailImage &&
+                  projectHasDetailWriteup(openProject) && (
+                    <ProjectDetailDescriptionBlock project={openProject} />
+                  )}
+              </div>
             </div>
           </div>
         </div>
