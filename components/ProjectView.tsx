@@ -59,7 +59,7 @@ function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
 
   return (
     <section
-      className="mt-12 w-full max-w-[1440px] border-t border-zinc-800 pt-12 pb-8"
+      className="mx-auto mt-12 w-full max-w-[1440px] border-t border-zinc-800 pt-12 pb-8"
       aria-label="프로젝트 상세 설명"
     >
       {paragraphs.length > 0 ? (
@@ -251,6 +251,15 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
       document.body.style.overflow = originalOverflow || "";
     };
   }, [openProject]);
+
+  const openProjectIndex = openProject
+    ? PROJECTS.findIndex((p) => p.id === openProject.id)
+    : -1;
+
+  useEffect(() => {
+    if (!openProject || !modalScrollRef.current) return;
+    modalScrollRef.current.scrollTo({ top: 0, behavior: "auto" });
+  }, [openProject?.id]);
 
   // 각 프로젝트 이미지에서 대표 색상 추출 (클라이언트 전용)
   useEffect(() => {
@@ -566,29 +575,64 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
               </svg>
             </button>
 
-            <button
-              type="button"
-              onClick={() =>
-                modalScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" })
-              }
-              className="fixed bottom-3 right-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-zinc-200 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white"
-              aria-label="맨 위로 이동"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden
+            <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex items-end justify-between px-3 pb-3">
+              <button
+                type="button"
+                disabled={openProjectIndex <= 0}
+                onClick={() => {
+                  if (openProjectIndex <= 0) return;
+                  setOpenProject(PROJECTS[openProjectIndex - 1]);
+                }}
+                className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-zinc-200 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-30"
+                aria-label="이전 프로젝트"
               >
-                <path d="M12 19V5M5 12l7-7 7 7" />
-              </svg>
-            </button>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M15 6 9 12 15 18" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                disabled={openProjectIndex < 0 || openProjectIndex >= PROJECTS.length - 1}
+                onClick={() => {
+                  if (
+                    openProjectIndex < 0 ||
+                    openProjectIndex >= PROJECTS.length - 1
+                  ) {
+                    return;
+                  }
+                  setOpenProject(PROJECTS[openProjectIndex + 1]);
+                }}
+                className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-zinc-200 backdrop-blur-md transition-colors hover:bg-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-30"
+                aria-label="다음 프로젝트"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M9 6 15 12 9 18" />
+                </svg>
+              </button>
+            </div>
 
-            <div className="w-full py-8 pl-2 pr-4 sm:pl-3 sm:pr-5 md:pl-4 md:pr-6 bg-transparent">
-              <div className="mb-4 max-w-5xl">
+            <div className="w-full bg-transparent px-4 py-8 sm:px-6 md:px-8">
+              <div className="mx-auto mb-4 w-full max-w-5xl">
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">
                   PROJECT DETAIL
                 </p>
@@ -602,7 +646,7 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
                 )}
               </div>
 
-              <div className="w-full max-w-[1440px]">
+              <div className="mx-auto w-full max-w-[1440px]">
                 <Image
                   src={`${
                     openProject.detailImage ?? openProject.image
