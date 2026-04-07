@@ -216,8 +216,8 @@ function parseRgbStringToPastelDarker(rgb: string): string {
   return applySubtlePastelDarker(Number(m[1]), Number(m[2]), Number(m[3]));
 }
 
-/** hover 배경: 이미지 색 추출 대신 프로젝트 accent 고정 (브랜드 컬러 유지) */
-const ACCENT_FROM_PROJECT_IDS = [7, 8, 10, 12, 13, 14, 17];
+/** hover 배경: 이미지 색 추출 대신 프로젝트 accent 고정 (브랜드 컬러·배포/로컬 추출 편차 방지) */
+const ACCENT_FROM_PROJECT_IDS = [1, 7, 8, 10, 12, 13, 14, 17];
 
 export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps) {
   useEffect(() => {
@@ -631,8 +631,8 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
               </button>
             </div>
 
-            <div className="w-full bg-transparent px-4 py-8 sm:px-6 md:px-8">
-              <div className="mx-auto mb-4 w-full max-w-5xl">
+            <div className="w-full py-8 pl-2 pr-4 sm:pl-3 sm:pr-5 md:pl-4 md:pr-6 bg-transparent">
+              <div className="mb-4 max-w-5xl">
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-400">
                   PROJECT DETAIL
                 </p>
