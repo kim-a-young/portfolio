@@ -547,7 +547,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
 
   return (
     <main className="flex min-h-svh flex-col bg-[var(--main-bg)]">
-      <div className="mx-auto flex min-h-0 w-full max-w-[768px] flex-1 flex-col px-4 pb-[30px] pt-[30px]">
+      <div className="mx-auto flex min-h-0 w-full max-w-[var(--main-content-max)] flex-1 flex-col px-4 pb-[30px] pt-[30px]">
         {!hasMessages ? (
           <WelcomeBlock
             input={input}
@@ -648,7 +648,7 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
                 right: 0,
               }}
             >
-              <div className="mx-auto max-w-[768px] flex flex-col gap-3">
+              <div className="mx-auto flex max-w-[var(--main-content-max)] flex-col gap-3">
                 <ChatInput
                   value={input}
                   onChange={handleInputChange}

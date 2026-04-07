@@ -32,7 +32,7 @@ export function WelcomeBlock({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-0 -translate-y-6 md:-translate-y-8">
-      <div className="flex w-full max-w-[768px] flex-col gap-[40px] pb-[60px]">
+      <div className="flex w-full max-w-[var(--main-content-max)] flex-col gap-[40px] pb-[60px]">
         <div
           className={`${stagger} mb-2 flex h-[90px] items-start justify-center pt-[30px] md:pt-[32px]`}
         >

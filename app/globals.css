@@ -25,6 +25,8 @@
   --sidebar-bg: #FFFFFF;
   --pill-bg: #EFEFF1;
   --sidebar-hover: #F6F8FB;
+  /* 메인 챗·웰컴: 모바일~노트북 768px 고정, 넓은 데스크톱(2xl↑)만 비율 확장 */
+  --main-content-max: 48rem;
 }
 
 [data-theme="dark"] {
@@ -44,6 +46,13 @@
 @theme inline {
   --color-background: var(--background);
   --font-sans: "Apple SD Gothic Neo", var(--font-noto-sans-kr), sans-serif;
+}
+
+/* Tailwind 2xl(1536px) 이상: 본문 폭 상한을 뷰포트 비율과 맞춤 */
+@media (min-width: 1536px) {
+  :root {
+    --main-content-max: min(72rem, 90vw);
+  }
 }
 
 @media (prefers-color-scheme: dark) {

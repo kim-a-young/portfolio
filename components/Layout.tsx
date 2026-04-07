@@ -206,9 +206,9 @@ export function Layout({ mainEntered = true }: LayoutProps) {
                 role="status"
                 className={`menu-project-hint-pop pointer-events-none relative max-w-[min(17rem,calc(100vw-5.5rem))] origin-left ${menuHintExiting ? "menu-project-hint-out" : ""}`}
               >
-                <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--background)] px-3.5 py-2 text-sm leading-snug text-[var(--text-primary)] shadow-md">
+                <div className="relative rounded-2xl border border-zinc-600 bg-[#0f0f10] px-3.5 py-2 text-sm leading-snug text-zinc-100">
                   <span
-                    className="pointer-events-none absolute left-0 top-1/2 z-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-l border-[var(--border)] bg-[var(--background)]"
+                    className="pointer-events-none absolute left-0 top-1/2 z-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-b border-l border-zinc-600 bg-[#0f0f10]"
                     aria-hidden
                   />
                   <span className="relative z-10 block">
