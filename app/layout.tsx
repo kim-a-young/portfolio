@@ -12,7 +12,7 @@ const notoSansKR = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "디자이너 김아영 | 정보 수집 | 포트폴리오",
+  title: "디자이너 김아영 | 포트폴리오",
   description:
     "디자이너 김아영 포트폴리오·정보 수집용 AI 챗 — 프로젝트와 지원 정보를 질문하고 답변을 받을 수 있습니다.",
 };
