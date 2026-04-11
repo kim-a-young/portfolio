@@ -22,6 +22,8 @@ const markdownProseUser =
 interface ChatMessageProps {
   role: Role;
   content: string;
+  /** 신규 채팅 도크 등: 본문·버튼 글자 1px 축소 */
+  compactFont?: boolean;
   showProfilePhoto?: boolean;
   isTyping?: boolean;
   /** API SSE로 본문이 실시간 수신 중 */
@@ -34,14 +36,18 @@ interface ChatMessageProps {
   onQuestionClick?: (question: string) => void;
   /** Full text is already in `content`; called once when chunk stream animation finishes */
   onAssistantStreamComplete?: () => void;
+  /** 신규 페이지 도킹 채팅 등: 본문·버튼 폰트 1px 축소 */
+  compactUI?: boolean;
 }
 
 export function ChatMessage({
   role,
   content,
+  compactFont = false,
   showProfilePhoto = false,
   isTyping = false,
   isStreaming = false,
+  compactUI = false,
   interviewerQuestions,
   showInterviewerPrompt = false,
   isLoadingQuestions = false,
@@ -197,6 +203,12 @@ export function ChatMessage({
     };
   }, [isUser, isTyping]);
 
+  const bodySize = compactFont ? "text-[14px]" : "text-[15px]";
+  const btnSize = compactFont ? "text-[14px]" : "text-sm";
+  /** 쇼케이스 도크 등: MD 제목·코드도 본문과 동일 px에 맞춤 */
+  const compactMarkdownUniform =
+    "[&_h1]:!text-[14px] [&_h2]:!text-[14px] [&_h3]:!text-[14px] [&_code]:!text-[14px]";
+
   return (
     <div
       className={`flex w-full flex-col gap-2 ${isUser ? "items-end" : "items-start"}`}
@@ -206,7 +218,7 @@ export function ChatMessage({
       {isUser ? (
         <>
           <div
-            className={`max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed bg-[#0F111D] text-white dark:bg-white dark:text-[#0F0F10] ${markdownProseUser}`}
+            className={`max-w-[85%] rounded-2xl px-4 py-3 ${bodySize} leading-relaxed bg-[#0F111D] text-white dark:bg-white dark:text-[#0F0F10] ${markdownProseUser} ${compactFont ? compactMarkdownUniform : ""}`}
           >
             <ReactMarkdown remarkPlugins={[remarkBreaks]}>
               {displayedContent}
@@ -227,7 +239,7 @@ export function ChatMessage({
             </div>
           )}
           <div
-            className={`w-full text-[15px] leading-[1.78] tracking-[-0.01em] text-[var(--text-primary)] antialiased ${markdownProseAssistant} ${isAnimating ? "chat-typing-cursor-prose" : ""}`}
+            className={`w-full ${bodySize} leading-[1.78] tracking-[-0.01em] text-[var(--text-primary)] antialiased ${markdownProseAssistant} ${compactFont ? compactMarkdownUniform : ""} ${isAnimating ? "chat-typing-cursor-prose" : ""}`}
           >
             {displayedContent === "" && isAnimating ? (
               <span className="chat-typing-cursor-mark font-light text-[var(--text-primary)]">
@@ -245,7 +257,7 @@ export function ChatMessage({
                 <button
                   onClick={onInterviewerPromptClick}
                   disabled={isLoadingQuestions}
-                  className="flex items-center justify-between rounded-2xl px-4 py-2 text-sm max-w-[85%] transition-colors border"
+                  className={`flex items-center justify-between rounded-2xl px-4 py-2 ${btnSize} max-w-[85%] transition-colors border`}
                   style={{
                     backgroundColor: "var(--border)",
                     color: "var(--text-primary)",
@@ -284,7 +296,7 @@ export function ChatMessage({
                     <button
                       key={index}
                       onClick={() => onQuestionClick?.(question)}
-                      className="rounded-2xl px-4 py-2 text-sm max-w-[85%] text-right transition-colors border"
+                      className={`rounded-2xl px-4 py-2 ${btnSize} max-w-[85%] text-right transition-colors border`}
                       style={{
                         backgroundColor: "var(--border)",
                         color: "var(--text-primary)",

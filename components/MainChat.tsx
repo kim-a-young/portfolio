@@ -64,8 +64,10 @@ export function MainChat({ chatId, initialMessages = [], onMessagesChange, sideb
     const isTypingComplete = typingMessageIndex === null;
     const streamIdle =
       streamingAssistantIndex === null && assistantRevealBusyIndex === null;
+    const hasUserMessage = messages.some((m) => m.role === "user");
 
     if (
+      hasUserMessage &&
       messages.length > 0 &&
       lastMessage?.role === "assistant" &&
       !isSubmitting &&

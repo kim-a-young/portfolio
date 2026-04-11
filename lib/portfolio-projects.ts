@@ -1,3 +1,9 @@
+import { HABITICT_IMAGES, HABITICT_THUM } from "./showcaseHabitictAsset";
+import { RTC_IMAGES, RTC_THUM } from "./showcaseRtcAsset";
+import { MONOPLEX_DETAIL1, MONOPLEX_THUM } from "./showcaseMonoplexAsset";
+import { REDCONNECT_THUM } from "./showcaseRedconnectAsset";
+import { GURUFIN_THUM } from "./showcaseGurufinAsset";
+
 export type ProjectItem = {
   id: number;
   name: string;
@@ -6,6 +12,8 @@ export type ProjectItem = {
   accent: string;
   meta?: string;
   detailImage?: string;
+  /** Detail modal image gallery. Overrides detailImage/image when set. */
+  detailImages?: string[];
   /** 있으면 상세 본문은 줄바꿈 대신 이 배열로만 나뉨(배포 번들에서도 문단 경계가 고정됨) */
   detailParagraphs?: string[];
   detailDesignTypes?: string;
@@ -20,7 +28,8 @@ const HERZION_DETAIL_PARAGRAPHS = [
   "그 결과, 앱과 홍보 영상 전반에 활용 가능한 브랜딩 기반을 구축하였으며, 신규 헬스케어 디바이스 전용 앱 수주 및 디자인 수행으로 이어지며 서비스 확장에 기여하였습니다.",
 ] as const;
 
-export const PROJECTS: ProjectItem[] = [
+/** /v2 쇼케이스용 최신 카피·순서·이미지 */
+export const SHOWCASE_PROJECTS: ProjectItem[] = [
   {
     id: 1,
     name: "항공정보포털 UI/UX 개편",
@@ -31,13 +40,34 @@ export const PROJECTS: ProjectItem[] = [
     detailImage: "/images/pf_airportal.png",
     detailDesignTypes: "Web UI/UX, Information Architecture, Design System, Data Visualization",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
-    detailDescription: `항공 관련 정보를 제공하는 웹 포털 'AirPortal'의 UI/UX 개편 프로젝트였습니다. 사용자 조사에서 메인이 복잡해 원하는 정보를 빠르게 찾기 어렵다는 피드백, 모바일 환경에서의 사용성 부족, 메뉴 구조의 난해함, 통계 데이터가 한눈에 읽히지 않는다는 과제가 드러났습니다.
+    detailParagraphs: [
+      "항공정보 포털 ‘AirPortal’ UI/UX 전면 개편 프로젝트에서 디자인 리드로 참여하여, 전 과정을 주도했습니다.",
+      "항공정보산업실 및 유관 부서 인터뷰에 참여해 기존 서비스의 문제를 정의하고, 대국민 맞춤형 항공정보 서비스로의 개선 방향을 도출했습니다.",
+      "KRDS 기준을 참고하여 메인 구조나 메뉴체계를 재설계하고, 포털 목적에 맞는 정보 구조를 새롭게 구축했습니다.",
+      "또한 신뢰감을 줄 수 있는 컬러, 타이포그래피, 컴포넌트 등 UI 전반의 디자인 요소를 체계화하고 디자인 가이드를 수립했습니다.",
+      "이를 기반으로 PC·태블릿·모바일을 아우르는 반응형 웹을 설계하여 복잡한 공공 데이터를 직관적으로 전달하는 사용자 중심 포털로 개선하였습니다.",
+    ],
+  },
+  {
+    id: 21,
+    name: "다중 비행장 원격 통합 관제 시스템 구조 시각화",
+    url: "#",
+    image: RTC_THUM,
+    accent: "#0d9488",
+    meta: "데이터 · 관제 / 시각화",
+    detailImage: RTC_THUM,
+    detailImages: [...RTC_IMAGES],
+    detailDesignTypes:
+      "Control System UX, Information Architecture, Real-time Data Visualization",
+    detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
+    detailDescription: `여러 비행장을 원격으로 통합 관제하는 시스템의 제안 과정에서, 기획·기술 문서를 기반으로 복잡한 네트워크 구조를 이해하고, 연동 관계와 계층을 도식화하여 시각적으로 전달하는 작업을 담당했습니다.
 
-이에 통합 UI 시스템을 정의하고 정보 구조를 재정비하여 자주 쓰는 기능에 쉽게 닿도록 내비게이션을 단순화하였으며, PC·태블릿·모바일을 아우르는 반응형 설계를 적용하였습니다. 설계 원칙으로는 명확한 탐색 경로, 차트·그래프 등을 활용한 데이터 가독성, 화면 간 일관된 경험을 두었습니다.
+* 분산된 공항, 관제 센터, 이동형 관제탑 간 시스템 구성을 분석
+* 5G/LTE, WAN/LAN, 보안 장비 등 기술 요소 간 관계를 정리
+* 이해하기 어려운 네트워크 흐름을 한눈에 파악할 수 있도록 구조도 설계
+* 제안 문서 내에서 의사결정을 돕는 커뮤니케이션 도구로 활용
 
-시각적으로는 네이비·블루 계열을 중심으로 한 전문적인 톤과 가독성 높은 산세리프 타이포, 카드형 레이아웃과 아이콘으로 정보 덩어리를 구분하였습니다. 주요 화면으로는 중앙 검색과 항공편·공항·통계 등 퀵링크가 있는 랜딩, 실시간 운항 현황을 보여 주는 대시보드형 화면, 추이를 보여 주는 통계 페이지, 뉴스·공지 그리드 등이 포함됩니다.
-
-그 결과 데이터 밀도가 높은 공공·항공 정보 포털을 현대적이고 사용자 중심의 반응형 서비스로 정비하는 데 기여하였습니다.`,
+해당 프로젝트는 대외비로 인해 비식별화하여 표현하였습니다.`,
   },
   {
     id: 2,
@@ -49,19 +79,31 @@ export const PROJECTS: ProjectItem[] = [
     detailImage: "/images/pf_happyhabit.png",
     detailDesignTypes: "App UI/UX, ESG / Lifestyle Service, Community & Map UX",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
-    detailDescription: `다회용 컵 이용을 습관화해 일회용 컵 감축과 환경 보호를 돕는 앱 '해피해빗(happy habit)' 리뉴얼·기획 성격의 프로젝트입니다. 콘셉트는 '다회용 컵을 쓰는 반가운 습관'으로, 인식과 실제 행동 사이의 간극을 줄이는 것이 과제였습니다.
+    detailDescription: `친환경 서비스 ‘해피해빗’ 앱 통합 구축 프로젝트에서 디자인 리드로 참여하여, 서비스 전반의 UI/UX 설계와 시각적 경험을 주도했습니다.
 
-목표로는 QR·바코드 등으로 반납·이용을 단순하게 만드는 것, 절감한 컵 수·CO₂ 등 영향을 시각화해 동기를 주는 것, 사용자들이 에코 습관을 나눌 수 있는 커뮤니티를 만드는 것을 두었습니다. 키워드는 단순함, 습관, 친환경입니다.
+다양한 기능이 혼재되어 있던 기존 화면을 재구성하여, 사용자가 현재 상태와 다음 행동을 명확히 인지할 수 있도록 흐름을 개선했습니다.
 
-디자인 시스템은 신뢰와 청결감을 주는 블루(#2E58FF 등)를 메인으로 하고, 밝은 그레이·화이트로 여백감 있는 앱 톤을 맞추었습니다. 핵심 기능으로는 홈에서의 식별용 코드·포인트(해피 포인트), 습관·환경 기여 통계 대시보드, 지도 기반 참여 카페·반납기(해피 스테이션) 탐색 및 매장 카드, 사진 피드형 커뮤니티(좋아요·댓글) 등이 제시됩니다. 카페·사무실·일상 사용 등 시나리오 목업으로 실사용 맥락을 보여 줍니다.
+‘환경을 위한 행복한 습관’이라는 브랜드 방향성을 기반으로 브랜드 메시지가 자연스럽게 전달될 수 있도록 시각적 톤과 인터페이스를 재설계하고, 컬러·타이포그래피·아이콘 등 UI 요소를 정리하여 따뜻하고 긍정적인 브랜드 이미지를 강화했습니다.
 
-그 결과  시행 2년만에 일회용 컵 1,000만개를 절감하고, 탄소배출을 약 293톤 저감하였고, 리사이클 서비스로 확대로 ‘AI 분리배출 가이드’ 를 작업하여 UN 지속가능 발전 목표 기여 우수 모바일상 수상에 기여하였습니다.`,
+서비스 확장 과정에서 사용자 흐름을 정교하게 다듬고, 해피해빗이 ‘의무’가 아닌 ‘즐거운 경험’으로 인식되도록 고도화 해나갔습니다.`,
+  },
+  {
+    id: 20,
+    name: "MONOPLEX POS 시스템 구축",
+    url: "#",
+    image: MONOPLEX_THUM,
+    accent: "#166534",
+    meta: "키오스크 · POS",
+    detailImage: MONOPLEX_DETAIL1,
+    detailDesignTypes: "Kiosk UI/UX, POS System, Dark Mode, Payment Flow",
+    detailTools: "Tool : Figma, Photoshop, Illustrator",
+    detailDescription: `모노플렉스의 통합 결제 및 관리 시스템 구축 프로젝트입니다. 직관적인 UI와 다크 모드를 적용하여 시인성을 높이고 사용자 결제 동선을 최적화했습니다.`,
   },
   {
     id: 3,
     name: "대한적십자 헌혈앱 고도화",
     url: "#",
-    image: "/images/pf_redconnect_m.png",
+    image: REDCONNECT_THUM,
     accent: "#dc2626", // 레드
     meta: "앱 · 고도화",
     detailDesignTypes: "App, BackOffice UI/UX Design 100%",
@@ -81,6 +123,7 @@ export const PROJECTS: ProjectItem[] = [
     image: "/images/pf_herzion_m.png",
     accent: "#4f46e5", // 보라/블루
     meta: "앱 · 구축",
+    detailImage: "/images/pf_herzion_m.png",
     detailDesignTypes: "UI/UX Design 100%, Brand Identity, Character Design, Motion Graphic Design",
     detailTools: "Tool : XD, Photoshop, Illustrator, After Effects",
     detailParagraphs: [...HERZION_DETAIL_PARAGRAPHS],
@@ -90,7 +133,7 @@ export const PROJECTS: ProjectItem[] = [
     id: 5,
     name: "구루핀월렛 앱 UI 리뉴얼",
     url: "#",
-    image: "/images/pf_gurufin_m.png",
+    image: GURUFIN_THUM,
     accent: "#1d4ed8", // 블루
     meta: "앱 · 금융",
     detailDesignTypes: "UI Design 100%",
@@ -100,6 +143,25 @@ export const PROJECTS: ProjectItem[] = [
 컬러, 타이포그래피, 컴포넌트 등 UI 전반의 디자인 요소를 체계화하고, 일관된 스타일 가이드를 정의하여 인터페이스를 정리하였습니다. 또한 금융 서비스의 신뢰감은 유지하면서도 과도하게 딱딱한 인상을 완화할 수 있도록 시각적 톤을 조정하였습니다.
 
 화면 구성을 보다 명확하고 직관적으로 개선하였으며, 일관된 디자인 시스템을 기반으로 서비스 전반의 완성도와 가독성을 향상시켰습니다.`,
+  },
+  {
+    id: 22,
+    name: "해피해빗 SCM 구축",
+    url: "#",
+    image: HABITICT_THUM,
+    accent: "#c2410c",
+    meta: "웹 · SCM",
+    detailImage: HABITICT_THUM,
+    detailImages: [...HABITICT_IMAGES],
+    detailDesignTypes: "Web UI/UX, SCM, Admin & Operations Console, Data Table UX",
+    detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
+    detailDescription: `다회용 컵·친환경 캠페인 서비스 ‘해피해빗’과 연계된 SCM 시스템입니다.
+
+매장·반납기·물류·재고 등 운영 데이터를 다루고, 현장과 본부가 동일한 기준으로 의사결정할 수 있도록 관리 화면의 정보 구조와 업무 흐름을 설계하였습니다.
+
+대량의 목록·상태·이력을 다루는 화면에서는 검색·필터·일괄 처리 등 조작 효율을 우선하고, 오류·지연·예외 상황이 직관적으로 드러나도록 정리하였습니다.
+
+브랜드 톤과 맞춘 컬러·타이포로 해피해빗 서비스와 시각적 연속성을 유지하면서도, 운영 도구로서의 가독성과 신뢰감을 갖추도록 UI를 구성하였습니다.`,
   },
   {
     id: 6,
@@ -286,6 +348,53 @@ export const PROJECTS: ProjectItem[] = [
     detailTools: "Tool : Photoshop, Illustrator",
   },
 ];
+
+/**
+ * 메인 사이드바·프로젝트 뷰 순서.
+ * 카드 번호 02·04·06에 해당하던 항목(id 21, 22, 20)은 /v2 이후 추가 분위기로 메인에서 제외.
+ */
+const MAIN_MENU_PROJECT_ORDER: number[] = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 12, 14, 16, 17, 18, 19,
+];
+
+/**
+ * 메인 메뉴 전용: 쇼케이스에서 바뀐 카피만 덮어씀 (21·22·20은 메인 목록에 없음).
+ */
+const LEGACY_PROJECT_OVERRIDES: Partial<
+  Record<number, Partial<ProjectItem> & { clearDetailImages?: true }>
+> = {
+  2: {
+    detailDescription: `다회용 컵 이용을 습관화해 일회용 컵 감축과 환경 보호를 돕는 앱 '해피해빗(happy habit)' 리뉴얼·기획 성격의 프로젝트입니다. 콘셉트는 '다회용 컵을 쓰는 반가운 습관'으로, 인식과 실제 행동 사이의 간극을 줄이는 것이 과제였습니다.
+
+목표로는 QR·바코드 등으로 반납·이용을 단순하게 만드는 것, 절감한 컵 수·CO₂ 등 영향을 시각화해 동기를 주는 것, 사용자들이 에코 습관을 나눌 수 있는 커뮤니티를 만드는 것을 두었습니다. 키워드는 단순함, 습관, 친환경입니다.
+
+디자인 시스템은 신뢰와 청결감을 주는 블루(#2E58FF 등)를 메인으로 하고, 밝은 그레이·화이트로 여백감 있는 앱 톤을 맞추었습니다. 핵심 기능으로는 홈에서의 식별용 코드·포인트(해피 포인트), 습관·환경 기여 통계 대시보드, 지도 기반 참여 카페·반납기(해피 스테이션) 탐색 및 매장 카드, 사진 피드형 커뮤니티(좋아요·댓글) 등이 제시됩니다. 카페·사무실·일상 사용 등 시나리오 목업으로 실사용 맥락을 보여 줍니다.
+
+그 결과  시행 2년만에 일회용 컵 1,000만개를 절감하고, 탄소배출을 약 293톤 저감하였고, 리사이클 서비스로 확대로 ‘AI 분리배출 가이드’ 를 작업하여 UN 지속가능 발전 목표 기여 우수 모바일상 수상에 기여하였습니다.`,
+  },
+};
+
+function toMainMenuProject(
+  base: ProjectItem,
+  override?: Partial<ProjectItem> & { clearDetailImages?: true }
+): ProjectItem {
+  if (!override) return base;
+  const { clearDetailImages, ...rest } = override;
+  const merged: ProjectItem = { ...base, ...rest };
+  if (clearDetailImages) {
+    delete merged.detailImages;
+  }
+  return merged;
+}
+
+/** 메인(레이아웃) 프로젝트 메뉴·ProjectView — /v2 이전 카피·순서 */
+export const PROJECTS: ProjectItem[] = MAIN_MENU_PROJECT_ORDER.map((id) => {
+  const base = SHOWCASE_PROJECTS.find((p) => p.id === id);
+  if (!base) {
+    throw new Error(`SHOWCASE_PROJECTS missing id ${id}`);
+  }
+  return toMainMenuProject(base, LEGACY_PROJECT_OVERRIDES[id]);
+});
 
 /**
  * 프로젝트 메뉴(리스트)에는 노출하지 않지만, 채팅 LLM 컨텍스트에는 포함할 경험.

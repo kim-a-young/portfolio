@@ -67,7 +67,10 @@ function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
           {leftColumn}
           <div className="min-w-0 space-y-4">
             {paragraphs.map((para, i) => (
-              <p key={i} className="text-sm leading-[1.75] text-zinc-200">
+              <p
+                key={i}
+                className="whitespace-pre-line text-sm leading-[1.75] text-zinc-200"
+              >
                 {para}
               </p>
             ))}

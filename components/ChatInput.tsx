@@ -10,6 +10,10 @@ interface ChatInputProps {
   disabled?: boolean;
   "aria-label"?: string;
   compact?: boolean;
+  /** textarea 글자 1px 축소 (14px → 13px) */
+  compactFont?: boolean;
+  /** 지정 시 위 두 옵션보다 우선 (쇼케이스 등 본문 크기 통일용) */
+  textSizeClass?: string;
 }
 
 function SendIcon({ className }: { className?: string }) {
@@ -28,6 +32,8 @@ export function ChatInput({
   disabled = false,
   "aria-label": ariaLabel = "질문 입력",
   compact = false,
+  compactFont = false,
+  textSizeClass,
 }: ChatInputProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -57,6 +63,8 @@ export function ChatInput({
   const textareaMinHeight = compact ? "min-h-[60px]" : "min-h-[170px]";
   const textareaMaxHeight = compact ? "max-h-[120px]" : "max-h-[200px]";
   const padding = compact ? "py-3" : "py-4";
+  const textSize =
+    textSizeClass ?? (compactFont ? "text-[13px]" : "text-[14px]");
 
   return (
     <div className="input-border-gradient focus-within:shadow-lg transition-shadow duration-200">
@@ -69,7 +77,7 @@ export function ChatInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={compact ? 2 : 4}
-          className={`${textareaMinHeight} ${textareaMaxHeight} flex-1 resize-none bg-transparent text-[14px] text-[var(--text-primary)] outline-none caret-[var(--accent)] placeholder:opacity-80 [&::placeholder]:[color:var(--text-secondary)]`}
+          className={`${textareaMinHeight} ${textareaMaxHeight} flex-1 resize-none bg-transparent ${textSize} text-[var(--text-primary)] outline-none caret-[var(--accent)] placeholder:opacity-80 [&::placeholder]:[color:var(--text-secondary)]`}
           aria-label={ariaLabel}
         />
         <button

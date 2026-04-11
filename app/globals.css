@@ -81,6 +81,47 @@ body {
   background: var(--background);
 }
 
+/* /v2 쇼케이스 플로팅 채팅 버튼 — 입력폼과 동일 그라데이션 링 */
+.showcase-chat-fab-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 2px;
+  background: linear-gradient(135deg, #8b7cf7 0%, #6d5ef3 25%, #6366f1 50%, #a78bfa 75%, #f97316 100%);
+  box-shadow:
+    0 0 20px -4px rgba(109, 94, 243, 0.25),
+    0 0 12px -4px rgba(249, 115, 22, 0.15);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.showcase-chat-fab-ring:hover {
+  box-shadow:
+    0 0 26px -3px rgba(109, 94, 243, 0.38),
+    0 0 16px -3px rgba(249, 115, 22, 0.22);
+}
+
+.showcase-chat-fab-ring:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--background),
+    0 0 0 4px #6d5ef3,
+    0 0 22px -3px rgba(109, 94, 243, 0.35);
+}
+
+.showcase-chat-fab-inner {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
 /* Hero 블롭 회전 */
 @keyframes hero-blob-rotate {
   from { transform: rotate(0deg); }
@@ -232,5 +273,29 @@ body {
   .chat-typing-cursor-prose > p:last-of-type::after {
     animation: none;
     opacity: 0.55;
+  }
+}
+
+/* /v2 쇼케이스: 카드 그리드 등장 */
+@keyframes showcase-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.showcase-card-enter {
+  animation: showcase-card-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-card-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }

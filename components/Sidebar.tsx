@@ -184,7 +184,9 @@ export function Sidebar({
               type="button"
               onClick={() => onSelectProject("projects")}
               className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors hover:bg-[var(--sidebar-hover)] ${
-                selectedProject === "projects" ? "bg-[var(--sidebar-hover)]" : ""
+                selectedProject === "projects"
+                  ? "bg-[var(--sidebar-hover)]"
+                  : ""
               }`}
               style={{ color: "var(--text-primary)" }}
               aria-label="프로젝트"
