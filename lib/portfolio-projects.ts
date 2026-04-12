@@ -22,10 +22,10 @@ export type ProjectItem = {
 };
 
 const HERZION_DETAIL_PARAGRAPHS = [
-  "퇴행성 뇌질환 예방을 위한 음향진동 케어 디바이스의 전용 앱 ‘헤르지온’은 웰니스 서비스로서 사용자에게 안정감과 신뢰를 전달하는 경험 설계가 중요한 프로젝트였습니다. 특히 비전문가와 중장년층 사용자도 쉽게 사용할 수 있도록 단순하고 직관적인 구조 설계가 주요 과제로 주어졌습니다.",
-  "서비스 구조를 단순화하고, 사용 목적에 따라 쉽게 선택할 수 있는 흐름으로 UI를 구성하였습니다. 또한 헤르지온만의 아이덴티티를 전달할 수 있도록 캐릭터를 기획 및 디자인하고, 서비스 전반에 일관되게 적용하였습니다.",
+  "음향진동 블루투스 헬스케어 기기 연동 앱 ‘헤르지온’ 구축의 디자인 리드로 참여하여 전체를 디자인했습니다.",
+  "비전문가와 중장년층 사용자도 쉽게 사용할 수 있도록 단순하고 직관적인 화면을 구성하고, 사용 목적에 따라 쉽게 선택할 수 있는 흐름으로 UI를 구성하였습니다.",
+  "또한 헤르지온만의 아이덴티티를 전달할 수 있도록 캐릭터를 기획 및 디자인하고, 서비스 전반에 일관되게 적용하였습니다.",
   "디바이스와의 연결 경험에서는 인터렉션과 애니메이션을 활용하여 사용자에게 자연스럽고 연결감 있는 경험으로 확장하였습니다.",
-  "그 결과, 앱과 홍보 영상 전반에 활용 가능한 브랜딩 기반을 구축하였으며, 신규 헬스케어 디바이스 전용 앱 수주 및 디자인 수행으로 이어지며 서비스 확장에 기여하였습니다.",
 ] as const;
 
 /** /v2 쇼케이스용 최신 카피·순서·이미지 */
@@ -38,7 +38,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     accent: "#0369a1", // 딥 블루
     meta: "웹 · 공공서비스",
     detailImage: "/images/pf_airportal.png",
-    detailDesignTypes: "Web UI/UX, Information Architecture, Design System, Data Visualization",
+    detailDesignTypes: "Web, UI/UX, Information Architecture, Design System, Data Visualization",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
     detailParagraphs: [
       "항공정보 포털 ‘AirPortal’ UI/UX 전면 개편 프로젝트에서 디자인 리드로 참여하여, 전 과정을 주도했습니다.",
@@ -57,8 +57,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     meta: "데이터 · 관제 / 시각화",
     detailImage: RTC_THUM,
     detailImages: [...RTC_IMAGES],
-    detailDesignTypes:
-      "Control System UX, Information Architecture, Real-time Data Visualization",
+    detailDesignTypes: "Control System, Visualization",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
     detailDescription: `여러 비행장을 원격으로 통합 관제하는 시스템의 제안 과정에서, 기획·기술 문서를 기반으로 복잡한 네트워크 구조를 이해하고, 연동 관계와 계층을 도식화하여 시각적으로 전달하는 작업을 담당했습니다.
 
@@ -77,7 +76,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     accent: "#f97316", // 오렌지
     meta: "앱 · 리뉴얼",
     detailImage: "/images/pf_happyhabit.png",
-    detailDesignTypes: "App UI/UX, ESG / Lifestyle Service, Community & Map UX",
+    detailDesignTypes: "App, UI/UX, ESG / Lifestyle Service, Community & Map UX",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
     detailDescription: `친환경 서비스 ‘해피해빗’ 앱 통합 구축 프로젝트에서 디자인 리드로 참여하여, 서비스 전반의 UI/UX 설계와 시각적 경험을 주도했습니다.
 
@@ -95,9 +94,11 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     accent: "#166534",
     meta: "키오스크 · POS",
     detailImage: MONOPLEX_DETAIL1,
-    detailDesignTypes: "Kiosk UI/UX, POS System, Dark Mode, Payment Flow",
+    detailDesignTypes: "Kiosk, UI/UX, POS System, Dark Mode, Payment Flow",
     detailTools: "Tool : Figma, Photoshop, Illustrator",
-    detailDescription: `모노플렉스의 통합 결제 및 관리 시스템 구축 프로젝트입니다. 직관적인 UI와 다크 모드를 적용하여 시인성을 높이고 사용자 결제 동선을 최적화했습니다.`,
+    detailDescription: `모노플렉스의 통합 결제 및 관리 시스템 구축 프로젝트입니다.
+
+직관적인 UI와 다크 모드를 적용하여 시인성을 높이고 사용자 결제 동선을 최적화했습니다.`,
   },
   {
     id: 3,
@@ -106,13 +107,15 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: REDCONNECT_THUM,
     accent: "#dc2626", // 레드
     meta: "앱 · 고도화",
-    detailDesignTypes: "App, BackOffice UI/UX Design 100%",
+    detailDesignTypes: "App, Admin, UI/UX",
     detailTools: "Tool : XD, Photoshop, Illustrator",
-    detailDescription: `대한적십자사의 공식 헌혈 앱 '레드커넥트'는 비대면 서비스 확대와 함께 사용자 경험 개선이 필요한 프로젝트였습니다. 기존 서비스는 사용자 동선이 분절되어 있고 접근성 기준을 충족하지 못한 화면이 존재하여 UX 개선이 요구되었습니다.
+    detailDescription: `‘레드커넥트’의 비대면 서비스 확대와 함께 사용자 경험 개선을 위한 고도화 디자인 리드를 담당하였습니다.
 
-고객사의 요구사항과 서비스 방향을 반영하여 헌혈 예약부터 방문, 결과 확인, 증서 발급까지 이어지는 흐름을 정리하고, 비대면 중심의 서비스 화면으로 UI 구조 정의 및 접근성 개선을 전반적으로 담당하며, 공공 서비스 기준에 맞는 인터페이스로 정비하였습니다.
+사용자 동선이 분절되어 있고 접근성 기준을 충족하지 못한 화면의 UX 개선을 위해 고객사의 요구사항과 서비스 방향을 반영하여 헌혈 예약부터 방문, 결과 확인, 증서 발급까지 이어지는 화면 흐름을 정리하였습니다.
 
-또한 기존 UI 패턴을 유지하면서 사용성을 개선하고, 백오피스 설계에 참여하여 운영 효율성과 관리 편의성을 고려한 서비스 구축에 기여하였습니다.
+비대면 중심의 서비스 화면으로 UI 구조 정의 및 접근성 작업으로, 공공 서비스 기준에 맞는 인터페이스로 정비하였습니다.
+
+또한 기존 UI 패턴을 유지하면서 일관성을 유지하고, 백오피스 설계에 참여하여 운영 효율성과 관리 편의성을 고려한 서비스 구축에 기여하였습니다.
 
 그 결과, 접근성 인증 마크를 획득하며 서비스 신뢰도를 강화하였고, 예약부터 발급까지 이어지는 비대면 헌혈 서비스 경험을 보다 안정적으로 제공할 수 있도록 개선하였습니다.`,
   },
@@ -124,7 +127,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     accent: "#4f46e5", // 보라/블루
     meta: "앱 · 구축",
     detailImage: "/images/pf_herzion_m.png",
-    detailDesignTypes: "UI/UX Design 100%, Brand Identity, Character Design, Motion Graphic Design",
+    detailDesignTypes: "UI/UX, Brand Identity, Character Design, Motion Graphic Design",
     detailTools: "Tool : XD, Photoshop, Illustrator, After Effects",
     detailParagraphs: [...HERZION_DETAIL_PARAGRAPHS],
     detailDescription: HERZION_DETAIL_PARAGRAPHS.join("\n\n"),
@@ -136,7 +139,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: GURUFIN_THUM,
     accent: "#1d4ed8", // 블루
     meta: "앱 · 금융",
-    detailDesignTypes: "UI Design 100%",
+    detailDesignTypes: "UI",
     detailTools: "Tool : XD, Photoshop, Illustrator",
     detailDescription: `블록체인 기반 디지털 자산 관리 서비스 '구루핀월렛'은 결제와 자산 관리를 동시에 제공하는 핀테크 앱으로, 사용자에게 신뢰감 있는 금융 경험을 전달하는 것이 중요한 서비스입니다. 기존 앱은 전반적으로 디자인 요소가 정돈되어 있지 않고 딱딱한 인상을 주어, 서비스 특성에 맞는 시각적 개선이 필요했습니다.
 
@@ -153,7 +156,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     meta: "웹 · SCM",
     detailImage: HABITICT_THUM,
     detailImages: [...HABITICT_IMAGES],
-    detailDesignTypes: "Web UI/UX, SCM, Admin & Operations Console, Data Table UX",
+    detailDesignTypes: "Web, UI/UX, SCM, Admin, Data Table UX",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
     detailDescription: `다회용 컵·친환경 캠페인 서비스 ‘해피해빗’과 연계된 SCM 시스템입니다.
 
@@ -170,7 +173,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_kb_m.png",
     accent: "#f97316", // 이미지 계열에 맞춘 오렌지 톤
     meta: "웹 · 금융",
-    detailDesignTypes: "Web/Mobile/App Maintenance Design, Publishing",
+    detailDesignTypes: "Web, Mobile, App, Maintenance, Publishing",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `KB손해보험의 서비스 운영 디자이너로 참여하여 보험 상품 및 이벤트 운영 디자인을 담당하였습니다. 주간 및 월간 단위로 진행되는 이벤트와 프로모션에 맞춰 메인 키비주얼 이미지를 제작하고, 배너·아이콘 등 서비스 전반의 시각 요소를 지속적으로 관리 및 개선하였습니다.
 
@@ -185,7 +188,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_heypoll_m.png",
     accent: "#C52AD9", // 보라/핑크 계열 고정 컬러
     meta: "앱 · 구축",
-    detailDesignTypes: "App UI/UX Design 100%",
+    detailDesignTypes: "App, UI/UX",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `리워드 기반 설문 참여 플랫폼 '헤이폴'은 사용자의 의견 참여를 콘텐츠화하고 포인트 보상을 통해 반복 사용을 유도하는 서비스로, 앱 런칭 단계에서 신규 BI를 반영한 UI 구축이 중요한 프로젝트였습니다.
 
@@ -202,7 +205,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_oled_m.png",
     accent: "#BE1441", // 고정 배경 컬러
     meta: "모바일 · 전시",
-    detailDesignTypes: "Web, Mobile Design 100%",
+    detailDesignTypes: "Web, Mobile",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `LG OLED SPACE 웹사이트는 OLED 기술의 강점과 차별성을 사용자에게 직관적으로 전달하기 위해 기획된 브랜드 콘텐츠 플랫폼입니다. 기술 중심의 정보를 나열하기보다, 비주얼 중심의 UI를 통해 OLED의 색감과 명암, 선명도를 감각적으로 전달하는 것이 중요한 프로젝트였습니다.
 
@@ -217,15 +220,13 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_kgcshop_m.png",
     accent: "#b91c1c", // 레드 계열
     meta: "웹 · 커머스",
-    detailDesignTypes: "Detail Page UI/UX Design, Graphic Design",
+    detailDesignTypes: "Detail Page, UI/UX, Graphic Design",
     detailTools: "Tool : Photoshop, Illustrator",
-    detailDescription: `건강기능식품 전문 쇼핑 플랫폼 ‘정관장몰’은 다양한 상품 정보를 신뢰감 있게 전달하고 구매로 이어지도록 하는 상세페이지 설계가 중요한 서비스입니다. 기존에는 자사몰과 외부몰 간 상세페이지 구성과 톤앤매너가 일관되지 않아 브랜드 경험이 분산되는 문제가 있었습니다.
+    detailDescription: `자사몰과 외부몰 간 상세페이지 구성과 톤앤매너가 일관되지 않아 브랜드 경험이 분산되는 문제 해결을 위해 2명의 디자이너가 약 250여 개 상품의 상세페이지를 모바일, 웹, 외부몰, 중국어 버전으로 확장 적용할 수 있도록 체계적인 베리에이션 작업을 진행하였습니다.
 
-이에 고객사의 요구사항을 바탕으로 상세페이지 구조와 비주얼 톤을 재정비하고, 상품군(건강식품, 화장품, 반려동물식품)별 콘셉트를 구분하여 각 제품의 특징이 명확하게 전달될 수 있도록 콘텐츠 구성을 정리하였습니다. 또한 제형, 크기 등 핵심 정보를 직관적으로 전달할 수 있도록 아이콘 에셋을 제작하고, 다양한 환경에서도 일관된 표현이 가능하도록 디자인 가이드를 수립하였습니다.
+상세페이지 구조와 비주얼 톤을 재정비하고, 상품군(건강식품, 화장품, 반려동물식품)별 콘셉트를 구분하여 각 제품의 특징이 명확하게 전달될 수 있도록 콘텐츠 구성을 정리하였습니다.
 
-이후 2명의 디자이너가 약 250여 개 상품의 상세페이지를 모바일, 웹, 외부몰, 중국어 버전으로 확장 적용할 수 있도록 체계적인 베리에이션 작업을 진행하며, 가이드 기반의 운영이 가능하도록 디자인을 정리하였습니다.
-
-그 결과, 브랜드 일관성이 강화된 상세페이지를 구축하였으며 다양한 플랫폼과 상품군에서도 안정적으로 확장 및 운영이 가능한 콘텐츠 디자인 체계를 마련하였습니다.`,
+또한 제형, 크기 등 핵심 정보를 직관적으로 전달할 수 있도록 아이콘 에셋을 제작하고, 다양한 환경에서도 일관된 표현이 가능하도록 디자인 가이드를 수립하였습니다.`,
   },
   {
     id: 10,
@@ -234,7 +235,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_yju_m.png",
     accent: "#007fa0", // 대학 마크 컬러
     meta: "웹 · 교육",
-    detailDesignTypes: "Web, Mobile Design 100%",
+    detailDesignTypes: "Web, Mobile",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `영진전문대학 웹사이트 및 입학처 사이트는 입학, 학과, 공지 등 다양한 정보를 사용자에게 명확하게 전달하는 것이 중요한 교육 서비스 플랫폼입니다. 특히 방대한 정보 구조와 복잡한 메뉴 체계를 효율적으로 정리하여 가독성과 접근성이 필요했습니다.
 
@@ -249,7 +250,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_semas_m.png",
     accent: "#ea580c", // 오렌지
     meta: "웹 · 공공서비스",
-    detailDesignTypes: "Web Design 100%",
+    detailDesignTypes: "Web",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `전통시장화재공제 웹사이트는 전통시장 상인을 대상으로 화재 피해를 대비할 수 있는 공제 제도를 안내하고 가입을 유도하는 공공 서비스 플랫폼으로, 복잡한 제도를 쉽고 직관적으로 전달하는 것이 중요한 프로젝트였습니다.
 
@@ -314,7 +315,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_befemall_m.png",
     accent: "#fb7185", // 코랄/핑크
     meta: "앱 · 커머스",
-    detailDesignTypes: "App Design 100%",
+    detailDesignTypes: "App",
     detailTools: "Tool : Photoshop, Illustrator",
   },
   {
@@ -334,7 +335,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_amio_m.png",
     accent: "#16a34a", // 그린
     meta: "웹 · 커머스",
-    detailDesignTypes: "Web Design 100%, Visual Design",
+    detailDesignTypes: "Web, Visual Design",
     detailTools: "Tool : Photoshop, Illustrator",
   },
   {
@@ -344,7 +345,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_kyunghee_m.png",
     accent: "#334155", // 블루 그레이
     meta: "웹 · 교육",
-    detailDesignTypes: "Web Design 100%",
+    detailDesignTypes: "Web",
     detailTools: "Tool : Photoshop, Illustrator",
   },
 ];

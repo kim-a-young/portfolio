@@ -12,33 +12,49 @@ import Image from "next/image";
 import type { ProjectItem } from "@/lib/portfolio-projects";
 import { NEW_SHOWCASE_PROJECTS } from "@/lib/new-showcase-projects";
 import { ShowcaseChatDock } from "@/components/ShowcaseChatDock";
+import { ProjectDetailToolsRow } from "@/components/ProjectDetailToolsRow";
 
 const SHOWCASE_TABS = [
-  { id: "all" as const, label: "전체" },
-  { id: "app" as const, label: "앱 · 모바일" },
-  { id: "web" as const, label: "웹 · 시스템" },
+  { id: "all" as const, label: "All" },
+  { id: "webMobile" as const, label: "Web / Mobile" },
+  { id: "b2b" as const, label: "B2B Solution / SaaS" },
 ];
+
+/** 앱·모바일·브랜드/공공/커머스 웹 등 사용자 중심 디지털 제품 */
+const WEB_MOBILE_PROJECT_IDS = new Set<number>([
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20, 22,
+]);
+
+/** ERP·OMS·SCM·내부 시스템·관제·엔터프라이즈 도구 (웹/앱 운영 등 중복 시 양쪽 포함) */
+const B2B_SOLUTION_SAAS_PROJECT_IDS = new Set<number>([
+  6, 12, 13, 14, 15, 20, 21, 22,
+]);
 
 function projectMatchesTab(
   p: ProjectItem,
   tab: (typeof SHOWCASE_TABS)[number]["id"]
 ): boolean {
   if (tab === "all") return true;
-  const m = p.meta ?? "";
-  const isAppMobile = /앱|모바일/.test(m);
-  if (tab === "app") return isAppMobile;
-  return !isAppMobile;
+  if (tab === "webMobile") return WEB_MOBILE_PROJECT_IDS.has(p.id);
+  if (tab === "b2b") return B2B_SOLUTION_SAAS_PROJECT_IDS.has(p.id);
+  return false;
+}
+
+function normalizeShowcaseTagLabel(label: string): string {
+  const t = label.trim();
+  if (t === "웹") return "Web";
+  return t;
 }
 
 function projectTagChips(p: ProjectItem, max = 6): string[] {
   const raw = p.detailDesignTypes?.trim();
   if (!raw) {
     const head = p.meta?.split("·")[0]?.trim();
-    return head ? [head] : [];
+    return head ? [normalizeShowcaseTagLabel(head)] : [];
   }
   return raw
     .split(",")
-    .map((s) => s.trim())
+    .map((s) => normalizeShowcaseTagLabel(s))
     .filter(Boolean)
     .slice(0, max);
 }
@@ -100,7 +116,7 @@ export function NewShowcaseClient() {
                     : "font-normal text-neutral-500 hover:text-neutral-800"
                 }`}
               >
-                #{tab.label.replace(/\s+/g, "")}
+                #{tab.label}
               </button>
             );
           })}
@@ -441,7 +457,6 @@ function ProjectDetailModal({
   if (!project) return null;
 
   const gallerySlides = detailGallerySlides(project);
-  const chips = projectTagChips(project, 12);
   const paragraphs = detailBodyParagraphs(project);
 
   const detailIndex = navigableProjects.findIndex((p) => p.id === project.id);
@@ -504,9 +519,7 @@ function ProjectDetailModal({
                 {project.name}
               </h2>
               {project.detailTools?.trim() ? (
-                <p className="mt-2 text-sm text-neutral-500 sm:text-[15px]">
-                  {project.detailTools.trim()}
-                </p>
+                <ProjectDetailToolsRow detailTools={project.detailTools.trim()} />
               ) : null}
             </div>
 
@@ -528,19 +541,6 @@ function ProjectDetailModal({
                     등록된 상세 본문이 없습니다.
                   </p>
                 )}
-
-                {chips.length > 0 ? (
-                  <div className="mt-6 flex flex-wrap gap-2 sm:mt-7">
-                    {chips.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center rounded bg-neutral-100 px-2.5 py-1 text-[13px] font-medium text-neutral-700 sm:text-sm"
-                      >
-                        #{tag.replace(/^#/, "").trim()}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
               </div>
             </div>
 
