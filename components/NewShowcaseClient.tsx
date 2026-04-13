@@ -17,7 +17,7 @@ import { ProjectDetailToolsRow } from "@/components/ProjectDetailToolsRow";
 const SHOWCASE_TABS = [
   { id: "all" as const, label: "All" },
   { id: "webMobile" as const, label: "Web / Mobile" },
-  { id: "b2b" as const, label: "B2B Solution / SaaS" },
+  { id: "b2b" as const, label: "Enterprise Systems" },
 ];
 
 /** 앱·모바일·브랜드/공공/커머스 웹 등 사용자 중심 디지털 제품 */
