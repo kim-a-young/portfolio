@@ -21,6 +21,11 @@ function projectHasDetailWriteup(project: ProjectItem): boolean {
 }
 
 function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
+  const normalizeSentenceBreaks = (text: string): string =>
+    text
+      .replace(/\. +/g, ".\n")
+      .replace(/([.!?])\n(?=\n)/g, "$1");
+
   const rawBody = project.detailDescription?.trim() ?? "";
   const hasCustomMeta = Boolean(
     project.detailDesignTypes?.trim() || project.detailTools?.trim()
@@ -48,6 +53,7 @@ function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
           .split(/\n\s*\n/)
           .map((p) => p.trim())
           .filter(Boolean);
+  const normalizedParagraphs = paragraphs.map(normalizeSentenceBreaks);
 
   const leftColumn = (
     <div className="min-w-0 md:max-w-[25vw]">
@@ -66,7 +72,7 @@ function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,25vw)_minmax(0,1fr)] md:items-start md:gap-x-5 lg:gap-x-6">
           {leftColumn}
           <div className="min-w-0 space-y-4">
-            {paragraphs.map((para, i) => (
+            {normalizedParagraphs.map((para, i) => (
               <p
                 key={i}
                 className="whitespace-pre-line text-sm leading-[1.75] text-zinc-200"

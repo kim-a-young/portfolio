@@ -69,14 +69,21 @@ function cardCategoryLine(p: ProjectItem): string {
 }
 
 function detailBodyParagraphs(p: ProjectItem): string[] {
+  const normalizeSentenceBreaks = (text: string): string =>
+    text
+      .replace(/\. +/g, ".\n")
+      .replace(/([.!?])\n(?=\n)/g, "$1");
+
   if (p.detailParagraphs?.length) {
-    return p.detailParagraphs.map((t) => t.trim()).filter(Boolean);
+    return p.detailParagraphs
+      .map((t) => normalizeSentenceBreaks(t.trim()))
+      .filter(Boolean);
   }
   const d = p.detailDescription?.trim();
   if (!d) return [];
   return d
     .split(/\n\n+/)
-    .map((s) => s.trim())
+    .map((s) => normalizeSentenceBreaks(s.trim()))
     .filter(Boolean);
 }
 
@@ -161,8 +168,58 @@ export function NewShowcaseClient() {
   );
 }
 
-function slideNeedsUnoptimized(src: string) {
-  return /\.gif($|\?)/i.test(src);
+/** `/public` 정적 경로 — next/image를 거치지 않고 `<img>`로 원본 바이트 그대로 표시(재압축·리사이즈 없음) */
+function isPublicLocalImageSrc(src: string): boolean {
+  const pathOnly = src.split("?")[0] ?? "";
+  return pathOnly.startsWith("/");
+}
+
+/**
+ * 로컬 정적 이미지는 `<img>`로만 로드하고, 원격 URL만 `next/image` 사용.
+ */
+function ShowcaseProjectImage({
+  src,
+  alt,
+  fill: fillProp,
+  className,
+  sizes,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  fill?: boolean;
+  className?: string;
+  sizes?: string;
+  priority?: boolean;
+}) {
+  if (isPublicLocalImageSrc(src)) {
+    const cls = fillProp
+      ? `absolute inset-0 h-full w-full ${className ?? ""}`.trim()
+      : className;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- 로컬 정적 에셋은 원본 그대로 전달
+      <img
+        src={src}
+        alt={alt}
+        className={cls}
+        decoding="async"
+        loading={priority ? "eager" : "lazy"}
+        style={{ backfaceVisibility: "hidden" }}
+        {...(priority ? { fetchPriority: "high" as const } : {})}
+      />
+    );
+  }
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill={fillProp}
+      className={className}
+      sizes={sizes ?? "100vw"}
+      priority={priority}
+      unoptimized={/\.gif($|\?)/i.test(src.split("?")[0] ?? "")}
+    />
+  );
 }
 
 function ProjectCard({
@@ -182,13 +239,12 @@ function ProjectCard({
       className="group flex h-full w-full flex-col bg-white text-left focus-visible:outline focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
     >
       <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-neutral-100">
-        <Image
+        <ShowcaseProjectImage
           src={p.image}
           alt=""
           fill
-          className="object-cover object-top transition-transform duration-500 ease-out will-change-transform group-hover:scale-[1.045] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="object-cover object-top [transform:translateZ(0)]"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, (max-width: 2400px) 25vw, 400px"
-          unoptimized={slideNeedsUnoptimized(p.image)}
         />
       </div>
       <div className="flex flex-1 flex-col pt-4 sm:pt-5 md:pt-5">
@@ -324,14 +380,13 @@ function DetailImageCarousel({
 
   if (n === 1) {
     return (
-      <Image
+      <ShowcaseProjectImage
         src={slides[0]}
         alt=""
         fill
         className="object-cover object-top"
         sizes={sizes}
         priority
-        unoptimized={slideNeedsUnoptimized(slides[0])}
       />
     );
   }
@@ -368,14 +423,13 @@ function DetailImageCarousel({
               className="relative h-full shrink-0"
               style={{ width: `${stepPct}%` }}
             >
-              <Image
+              <ShowcaseProjectImage
                 src={src}
                 alt=""
                 fill
                 className="object-cover object-top"
                 sizes={sizes}
                 priority={i === 1}
-                unoptimized={slideNeedsUnoptimized(src)}
               />
             </div>
           ))}
@@ -524,7 +578,10 @@ function ProjectDetailModal({
                 {project.name}
               </h2>
               {project.detailTools?.trim() ? (
-                <ProjectDetailToolsRow detailTools={project.detailTools.trim()} />
+                <ProjectDetailToolsRow
+                  detailTools={project.detailTools.trim()}
+                  projectId={project.id}
+                />
               ) : null}
             </div>
 

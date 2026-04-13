@@ -2,7 +2,7 @@ import type { ProjectItem } from "./portfolio-projects";
 import { SHOWCASE_PROJECTS } from "./portfolio-projects";
 import { HABITICT_IMAGES, HABITICT_THUM } from "./showcaseHabitictAsset";
 import { MONOPLEX_DETAIL1, MONOPLEX_THUM } from "./showcaseMonoplexAsset";
-import { REDCONNECT_THUM } from "./showcaseRedconnectAsset";
+import { REDCONNECT_IMAGES, REDCONNECT_THUM } from "./showcaseRedconnectAsset";
 import { GURUFIN_THUM } from "./showcaseGurufinAsset";
 import { AIRPORTAL_IMAGES } from "./showcaseAirportalAsset";
 import { RTC_THUM } from "./showcaseRtcAsset";
@@ -61,7 +61,7 @@ export const NEW_SHOWCASE_PROJECTS: ProjectItem[] = SHOWCASE_PROJECTS.map((p) =>
     return {
       ...p,
       image: REDCONNECT_THUM,
-      detailImages: [REDCONNECT_THUM],
+      detailImages: [...REDCONNECT_IMAGES],
     };
   }
   if (p.id === 5) {

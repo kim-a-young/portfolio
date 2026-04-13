@@ -1,7 +1,7 @@
 import { HABITICT_IMAGES, HABITICT_THUM } from "./showcaseHabitictAsset";
 import { RTC_IMAGES, RTC_THUM } from "./showcaseRtcAsset";
 import { MONOPLEX_DETAIL1, MONOPLEX_THUM } from "./showcaseMonoplexAsset";
-import { REDCONNECT_THUM } from "./showcaseRedconnectAsset";
+import { REDCONNECT_IMAGES, REDCONNECT_THUM } from "./showcaseRedconnectAsset";
 import { GURUFIN_THUM } from "./showcaseGurufinAsset";
 
 export type ProjectItem = {
@@ -36,13 +36,13 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_airportal_m.png",
     accent: "#0369a1", // 딥 블루
-    meta: "웹 · 공공서비스",
+    meta: "공공 · 항공",
     detailImage: "/images/pf_airportal.png",
     detailDesignTypes: "Web, UI/UX, Information Architecture, Design System, Data Visualization",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
     detailParagraphs: [
-      "항공정보 포털 ‘AirPortal’ UI/UX 전면 개편 프로젝트에서 디자인 리드로 참여하여, 전 과정을 주도했습니다.",
-      "항공정보산업실 및 유관 부서 인터뷰에 참여해 기존 서비스의 문제를 정의하고, 대국민 맞춤형 항공정보 서비스로의 개선 방향을 도출했습니다.",
+      "항공정보포털 ‘AirPortal’ UI/UX 전면 개편 프로젝트에서 디자인 리드로 참여, 전 과정을 주도하고 전체 화면을 작업했습니다.",
+      "한국항공협회 및 유관부서 인터뷰에 참여해 기존 서비스의 문제를 정의하고, 대국민 맞춤형 항공정보 서비스로의 개선 방향을 도출했습니다.",
       "KRDS 기준을 참고하여 메인 구조나 메뉴체계를 재설계하고, 포털 목적에 맞는 정보 구조를 새롭게 구축했습니다.",
       "또한 신뢰감을 줄 수 있는 컬러, 타이포그래피, 컴포넌트 등 UI 전반의 디자인 요소를 체계화하고 디자인 가이드를 수립했습니다.",
       "이를 기반으로 PC·태블릿·모바일을 아우르는 반응형 웹을 설계하여 복잡한 공공 데이터를 직관적으로 전달하는 사용자 중심 포털로 개선하였습니다.",
@@ -54,7 +54,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: RTC_THUM,
     accent: "#0d9488",
-    meta: "데이터 · 관제 / 시각화",
+    meta: "데이터 · 항공 관제",
     detailImage: RTC_THUM,
     detailImages: [...RTC_IMAGES],
     detailDesignTypes: "Control System, Visualization",
@@ -74,11 +74,11 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_happyhabit_m.png",
     accent: "#f97316", // 오렌지
-    meta: "앱 · 리뉴얼",
+    meta: "ESG · 리워드 플랫폼",
     detailImage: "/images/pf_happyhabit.png",
-    detailDesignTypes: "App, UI/UX, ESG / Lifestyle Service, Community & Map UX",
+    detailDesignTypes: "App, UI/UX, Identity, Visual",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
-    detailDescription: `친환경 서비스 ‘해피해빗’ 앱 통합 구축 프로젝트에서 디자인 리드로 참여하여, 서비스 전반의 UI/UX 설계와 시각적 경험을 주도했습니다.
+    detailDescription: `친환경 서비스 ‘해피해빗’ 앱 통합 구축 프로젝트에서 디자인 리드로 참여하여, 서비스 전반의 UI/UX 디자인을 4년간 전담했습니다.
 
 다양한 기능이 혼재되어 있던 기존 화면을 재구성하여, 사용자가 현재 상태와 다음 행동을 명확히 인지할 수 있도록 흐름을 개선했습니다.
 
@@ -92,11 +92,11 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: MONOPLEX_THUM,
     accent: "#166534",
-    meta: "키오스크 · POS",
+    meta: "오프라인 · 시스템",
     detailImage: MONOPLEX_DETAIL1,
-    detailDesignTypes: "Kiosk, UI/UX, POS System, Dark Mode, Payment Flow",
+    detailDesignTypes: "Kiosk, UI/UX, Dark Mode, Payment Flow",
     detailTools: "Tool : Figma, Photoshop, Illustrator",
-    detailDescription: `모노플렉스의 통합 결제 및 관리 시스템 구축 프로젝트입니다.
+    detailDescription: `모노플렉스의 통합 결제 및 관리 시스템 구축 디자인을 전담하였습니다.
 
 직관적인 UI와 다크 모드를 적용하여 시인성을 높이고 사용자 결제 동선을 최적화했습니다.`,
   },
@@ -106,8 +106,10 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: REDCONNECT_THUM,
     accent: "#dc2626", // 레드
-    meta: "앱 · 고도화",
-    detailDesignTypes: "App, Admin, UI/UX",
+    meta: "공공 · 헬스케어",
+    detailImage: REDCONNECT_THUM,
+    detailImages: [...REDCONNECT_IMAGES],
+    detailDesignTypes: "App, UI/UX, Mobile accessibility",
     detailTools: "Tool : XD, Photoshop, Illustrator",
     detailDescription: `‘레드커넥트’의 비대면 서비스 확대와 함께 사용자 경험 개선을 위한 고도화 디자인 리드를 담당하였습니다.
 
@@ -125,9 +127,9 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_herzion_m.png",
     accent: "#4f46e5", // 보라/블루
-    meta: "앱 · 구축",
+    meta: "헬스케어",
     detailImage: "/images/pf_herzion_m.png",
-    detailDesignTypes: "UI/UX, Brand Identity, Character Design, Motion Graphic Design",
+    detailDesignTypes: "App, UI/UX, Brand Identity, Character Design, Motion Graphic",
     detailTools: "Tool : XD, Photoshop, Illustrator, After Effects",
     detailParagraphs: [...HERZION_DETAIL_PARAGRAPHS],
     detailDescription: HERZION_DETAIL_PARAGRAPHS.join("\n\n"),
@@ -138,12 +140,14 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: GURUFIN_THUM,
     accent: "#1d4ed8", // 블루
-    meta: "앱 · 금융",
-    detailDesignTypes: "UI",
+    meta: "금융 · 핀테크",
+    detailDesignTypes: "App, UI",
     detailTools: "Tool : XD, Photoshop, Illustrator",
-    detailDescription: `블록체인 기반 디지털 자산 관리 서비스 '구루핀월렛'은 결제와 자산 관리를 동시에 제공하는 핀테크 앱으로, 사용자에게 신뢰감 있는 금융 경험을 전달하는 것이 중요한 서비스입니다. 기존 앱은 전반적으로 디자인 요소가 정돈되어 있지 않고 딱딱한 인상을 주어, 서비스 특성에 맞는 시각적 개선이 필요했습니다.
+    detailDescription: `블록체인 기반 디지털 자산 관리 서비스 '구루핀월렛’의 기존 앱은 전반적으로 정돈되어 있지 않고 딱딱한 인상을 주어, 서비스 특성에 맞는 시각적 개선을 위한 전체 화면 UI를 담당했습니다.
 
-컬러, 타이포그래피, 컴포넌트 등 UI 전반의 디자인 요소를 체계화하고, 일관된 스타일 가이드를 정의하여 인터페이스를 정리하였습니다. 또한 금융 서비스의 신뢰감은 유지하면서도 과도하게 딱딱한 인상을 완화할 수 있도록 시각적 톤을 조정하였습니다.
+컬러, 타이포그래피, 컴포넌트 등 UI 전반의 디자인 요소를 체계화하고, 일관된 스타일 가이드를 정의하여 인터페이스를 정리하였습니다.
+
+또한 금융 서비스의 신뢰감은 유지하면서도 과도하게 딱딱한 인상을 완화할 수 있도록 시각적 톤을 조정하였습니다.
 
 화면 구성을 보다 명확하고 직관적으로 개선하였으며, 일관된 디자인 시스템을 기반으로 서비스 전반의 완성도와 가독성을 향상시켰습니다.`,
   },
@@ -153,10 +157,10 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: HABITICT_THUM,
     accent: "#c2410c",
-    meta: "웹 · SCM",
+    meta: "운영시스템 · SCM",
     detailImage: HABITICT_THUM,
     detailImages: [...HABITICT_IMAGES],
-    detailDesignTypes: "Web, UI/UX, SCM, Admin, Data Table UX",
+    detailDesignTypes: "Web, Mobile, UI/UX, Admin, Data Table UX",
     detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
     detailDescription: `다회용 컵·친환경 캠페인 서비스 ‘해피해빗’과 연계된 SCM 시스템입니다.
 
@@ -172,12 +176,14 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_kb_m.png",
     accent: "#f97316", // 이미지 계열에 맞춘 오렌지 톤
-    meta: "웹 · 금융",
+    meta: "금융 · 보험",
     detailDesignTypes: "Web, Mobile, App, Maintenance, Publishing",
     detailTools: "Tool : Photoshop, Illustrator",
-    detailDescription: `KB손해보험의 서비스 운영 디자이너로 참여하여 보험 상품 및 이벤트 운영 디자인을 담당하였습니다. 주간 및 월간 단위로 진행되는 이벤트와 프로모션에 맞춰 메인 키비주얼 이미지를 제작하고, 배너·아이콘 등 서비스 전반의 시각 요소를 지속적으로 관리 및 개선하였습니다.
+    detailDescription: `KB손해보험의 서비스 운영 디자이너로 참여하여 보험 상품 및 이벤트 운영 디자인을 담당하였습니다.
 
-고객사의 디자인 가이드를 기반으로 일관된 비주얼 톤을 유지하면서, 보험 상품 특성상 빈번하게 발생하는 콘텐츠 추가 및 변경 요청에 대응하여 신속하게 수정안을 반영하였고, HTML/CSS 퍼블리싱을 통해 실제 서비스에 적용될 수 있도록 지원하였습니다.
+주간 및 월간 단위로 진행되는 이벤트와 프로모션에 맞춰 메인 키비주얼 이미지를 제작하고, 배너·아이콘 등 서비스 전반의 시각 요소를 지속적으로 관리 및 개선하였습니다.
+
+디자인 가이드를 기반으로 일관된 비주얼 톤을 유지하면서, 보험 상품 특성상 빈번하게 발생하는 콘텐츠 추가 및 변경 요청에 대응하여 신속하게 수정안을 반영하였고, HTML/CSS 퍼블리싱을 통해 실제 서비스에 적용될 수 있도록 지원하였습니다.
 
 웹사이트, 모바일, 앱 등 다양한 플랫폼의 운영 특성을 고려하여 각 환경에 맞는 디자인을 제공하고, 반복적인 운영 환경에서도 일관된 디자인 품질을 유지하며 안정적인 서비스 운영을 유연하게 지원하였습니다.`,
   },
@@ -187,8 +193,8 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_heypoll_m.png",
     accent: "#C52AD9", // 보라/핑크 계열 고정 컬러
-    meta: "앱 · 구축",
-    detailDesignTypes: "App, UI/UX",
+    meta: "리워드 · 사용자 참여",
+    detailDesignTypes: "App, UI/UX, Promotions",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `리워드 기반 설문 참여 플랫폼 '헤이폴'은 사용자의 의견 참여를 콘텐츠화하고 포인트 보상을 통해 반복 사용을 유도하는 서비스로, 앱 런칭 단계에서 신규 BI를 반영한 UI 구축이 중요한 프로젝트였습니다.
 
@@ -204,8 +210,8 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_oled_m.png",
     accent: "#BE1441", // 고정 배경 컬러
-    meta: "모바일 · 전시",
-    detailDesignTypes: "Web, Mobile",
+    meta: "브랜드 · 전시",
+    detailDesignTypes: "Web, UI/UX",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `LG OLED SPACE 웹사이트는 OLED 기술의 강점과 차별성을 사용자에게 직관적으로 전달하기 위해 기획된 브랜드 콘텐츠 플랫폼입니다. 기술 중심의 정보를 나열하기보다, 비주얼 중심의 UI를 통해 OLED의 색감과 명암, 선명도를 감각적으로 전달하는 것이 중요한 프로젝트였습니다.
 
@@ -219,7 +225,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_kgcshop_m.png",
     accent: "#b91c1c", // 레드 계열
-    meta: "웹 · 커머스",
+    meta: "커머스",
     detailDesignTypes: "Detail Page, UI/UX, Graphic Design",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `자사몰과 외부몰 간 상세페이지 구성과 톤앤매너가 일관되지 않아 브랜드 경험이 분산되는 문제 해결을 위해 2명의 디자이너가 약 250여 개 상품의 상세페이지를 모바일, 웹, 외부몰, 중국어 버전으로 확장 적용할 수 있도록 체계적인 베리에이션 작업을 진행하였습니다.
@@ -234,7 +240,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_yju_m.png",
     accent: "#007fa0", // 대학 마크 컬러
-    meta: "웹 · 교육",
+    meta: "교육",
     detailDesignTypes: "Web, Mobile",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `영진전문대학 웹사이트 및 입학처 사이트는 입학, 학과, 공지 등 다양한 정보를 사용자에게 명확하게 전달하는 것이 중요한 교육 서비스 플랫폼입니다. 특히 방대한 정보 구조와 복잡한 메뉴 체계를 효율적으로 정리하여 가독성과 접근성이 필요했습니다.
@@ -249,8 +255,8 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_semas_m.png",
     accent: "#ea580c", // 오렌지
-    meta: "웹 · 공공서비스",
-    detailDesignTypes: "Web",
+    meta: "공공 · 보험",
+    detailDesignTypes: "Web, Design System",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `전통시장화재공제 웹사이트는 전통시장 상인을 대상으로 화재 피해를 대비할 수 있는 공제 제도를 안내하고 가입을 유도하는 공공 서비스 플랫폼으로, 복잡한 제도를 쉽고 직관적으로 전달하는 것이 중요한 프로젝트였습니다.
 
@@ -264,9 +270,10 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     id: 13,
     name: "SK엔카 ERP 구축",
     url: "#",
-    image: "/images/pf_skncar_m.png",
+    image: "/images/pf_skncar_m.jpg?v=5",
     accent: "#ea580c", // 오렌지 (기존 다크 브라운보다 밝게, 다른 프로젝트 톤과 맞춤)
-    meta: "웹 · 시스템 구축",
+    meta: "기업 · 시스템",
+    detailDesignTypes: "Design System, Publishing",
     detailTools: "Tool : Nexacro, Photoshop, Illustrator",
     detailDescription: `SK엔카의 사업 운영을 지원하는 내부 관리 시스템은 방대한 거래 데이터와 지점별 운영 현황을 효율적으로 관리하는 것이 중요한 플랫폼으로, 분산된 업무 환경에서도 일관된 사용 경험과 높은 가독성에 집중하였습니다.
 
@@ -280,7 +287,8 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_miraeasset_m.png",
     accent: "#1d4ed8", // 블루
-    meta: "웹 · 금융 시스템",
+    meta: "금융 · 시스템",
+    detailDesignTypes: "Design System, Publishing",
     detailTools: "Tool : Nexacro, Photoshop, Illustrator",
     detailDescription: `미래에셋증권의 OMS(Order Management System)는 대량의 금융 데이터를 기반으로 빠른 의사결정과 정확한 업무 처리가 요구되는 내부 업무 시스템으로, 장시간 사용 환경에서도 효율적이고 일관된 UI를 제공하는 것이 중요한 프로젝트였습니다.
 
@@ -294,9 +302,10 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     id: 12,
     name: "현대자동차연구소 표준개발시스템 구축",
     url: "#",
-    image: "/images/pf_hyundaimotorgroup_m.png",
+    image: "/images/pf_hyundaimotorgroup_m.jpg",
     accent: "#0A2366", // 현대 브랜드 딥 블루 (hover 배경 고정)
-    meta: "웹 · 시스템 구축",
+    meta: "기업 · 시스템",
+    detailDesignTypes: "Design System, Publishing",
     detailTools: "Tool : Nexacro, Photoshop, Illustrator",
   },
   {
@@ -305,7 +314,8 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_tmoney_m.png",
     accent: "#898989", // RGB 137,137,137 (hover 배경 고정)
-    meta: "웹 · 시스템 구축",
+    meta: "기업 · 시스템",
+    detailDesignTypes: "Design System, Publishing",
     detailTools: "Tool : Nexacro, Photoshop, Illustrator",
   },
   {
@@ -314,7 +324,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_befemall_m.png",
     accent: "#fb7185", // 코랄/핑크
-    meta: "앱 · 커머스",
+    meta: "커머스 · O2O",
     detailDesignTypes: "App",
     detailTools: "Tool : Photoshop, Illustrator",
   },
@@ -324,8 +334,8 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_lguplus_m.png",
     accent: "#898989", // RGB 137,137,137 (hover 배경 고정)
-    meta: "모바일 · 서브페이지",
-    detailDesignTypes: "Mobile Sub Design, Graphic Design",
+    meta: "기업 · 통신",
+    detailDesignTypes: "Mobile, Graphic Design",
     detailTools: "Tool : Photoshop, Illustrator",
   },
   {
@@ -334,7 +344,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_amio_m.png",
     accent: "#16a34a", // 그린
-    meta: "웹 · 커머스",
+    meta: "커머스",
     detailDesignTypes: "Web, Visual Design",
     detailTools: "Tool : Photoshop, Illustrator",
   },
@@ -344,8 +354,8 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_kyunghee_m.png",
     accent: "#334155", // 블루 그레이
-    meta: "웹 · 교육",
-    detailDesignTypes: "Web",
+    meta: "교육",
+    detailDesignTypes: "Web, Web Accessibility",
     detailTools: "Tool : Photoshop, Illustrator",
   },
 ];

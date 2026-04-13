@@ -43,11 +43,24 @@ function resolveToolToken(token: string): ResolvedTool {
       label: "Figma",
     };
   }
+  if (k === "nexacro") {
+    return {
+      kind: "icon",
+      src: "/images/tools/nexacro.jpg",
+      label: "Nexacro",
+    };
+  }
 
   return { kind: "text", label: t };
 }
 
-export function ProjectDetailToolsRow({ detailTools }: { detailTools: string }) {
+export function ProjectDetailToolsRow({
+  detailTools,
+  projectId,
+}: {
+  detailTools: string;
+  projectId?: number;
+}) {
   const trimmed = detailTools.trim();
   const m = trimmed.match(/^Tool\s*:\s*(.*)$/i);
   const body = m?.[1]?.trim() ?? "";
@@ -61,7 +74,11 @@ export function ProjectDetailToolsRow({ detailTools }: { detailTools: string }) 
   const tokens = body
     .split(",")
     .map((s) => s.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((token) => {
+      if (projectId === 1) return true;
+      return token.toLowerCase() !== "figma";
+    });
   const tools = tokens.map(resolveToolToken);
 
   return (
@@ -79,7 +96,9 @@ export function ProjectDetailToolsRow({ detailTools }: { detailTools: string }) 
               alt={tool.label}
               width={16}
               height={16}
-              className="h-4 w-4 shrink-0 object-contain"
+              className={`h-4 w-4 shrink-0 object-contain ${
+                tool.label === "Nexacro" ? "rounded-sm bg-white p-px" : ""
+              }`}
               decoding="async"
             />
           ) : (

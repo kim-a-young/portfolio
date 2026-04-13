@@ -1,12 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default async function HappyHabitPage({
-  params,
-}: {
-  params: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  await params;
+export default function HappyHabitPage() {
   return (
     <main className="flex min-h-screen flex-col bg-white">
       <div className="mx-auto flex w-full max-w-none flex-col px-4 pb-[60px] pt-[40px]">
