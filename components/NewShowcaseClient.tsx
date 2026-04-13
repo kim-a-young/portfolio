@@ -21,17 +21,17 @@ const SHOWCASE_TABS = [
   { id: "b2b" as const, label: "Enterprise Systems" },
 ];
 
-/** 앱·모바일·브랜드/공공/커머스 웹 등 사용자 중심 디지털 제품 (Maintenance 탭 전용 id 제외) */
+/** 앱·모바일·브랜드/공공/커머스 웹 등 사용자 중심 디지털 제품 (Maintenance과 중복 허용) */
 const WEB_MOBILE_PROJECT_IDS = new Set<number>([
-  3, 4, 5, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20,
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19,
 ]);
 
 /** 항공정보포털·해피해빗 앱·SKT 해피해빗 SCM·KB손해보험 전채널 운영 */
 const MAINTENANCE_PROJECT_IDS = new Set<number>([1, 2, 22, 6]);
 
-/** ERP·OMS·SCM·내부 시스템·관제·엔터프라이즈 도구 (Maintenance 탭 전용 id 제외) */
+/** ERP·OMS·SCM·내부 시스템·관제·엔터프라이즈 도구 (Maintenance과 중복 허용) */
 const B2B_SOLUTION_SAAS_PROJECT_IDS = new Set<number>([
-  12, 13, 14, 15, 20, 21,
+  12, 13, 14, 15, 20, 21, 22,
 ]);
 
 function projectMatchesTab(
