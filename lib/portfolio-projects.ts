@@ -149,7 +149,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
   },
   {
     id: 22,
-    name: "해피해빗 SCM 구축",
+    name: "SKT 해피해빗 SCM 구축",
     url: "#",
     image: HABITICT_THUM,
     accent: "#c2410c",

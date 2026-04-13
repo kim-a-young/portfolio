@@ -17,17 +17,21 @@ import { ProjectDetailToolsRow } from "@/components/ProjectDetailToolsRow";
 const SHOWCASE_TABS = [
   { id: "all" as const, label: "All" },
   { id: "webMobile" as const, label: "Web / Mobile" },
+  { id: "maintenance" as const, label: "Maintenance" },
   { id: "b2b" as const, label: "Enterprise Systems" },
 ];
 
-/** 앱·모바일·브랜드/공공/커머스 웹 등 사용자 중심 디지털 제품 */
+/** 앱·모바일·브랜드/공공/커머스 웹 등 사용자 중심 디지털 제품 (Maintenance 탭 전용 id 제외) */
 const WEB_MOBILE_PROJECT_IDS = new Set<number>([
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20, 22,
+  3, 4, 5, 7, 8, 9, 10, 11, 16, 17, 18, 19, 20,
 ]);
 
-/** ERP·OMS·SCM·내부 시스템·관제·엔터프라이즈 도구 (웹/앱 운영 등 중복 시 양쪽 포함) */
+/** 항공정보포털·해피해빗 앱·SKT 해피해빗 SCM·KB손해보험 전채널 운영 */
+const MAINTENANCE_PROJECT_IDS = new Set<number>([1, 2, 22, 6]);
+
+/** ERP·OMS·SCM·내부 시스템·관제·엔터프라이즈 도구 (Maintenance 탭 전용 id 제외) */
 const B2B_SOLUTION_SAAS_PROJECT_IDS = new Set<number>([
-  6, 12, 13, 14, 15, 20, 21, 22,
+  12, 13, 14, 15, 20, 21,
 ]);
 
 function projectMatchesTab(
@@ -36,6 +40,7 @@ function projectMatchesTab(
 ): boolean {
   if (tab === "all") return true;
   if (tab === "webMobile") return WEB_MOBILE_PROJECT_IDS.has(p.id);
+  if (tab === "maintenance") return MAINTENANCE_PROJECT_IDS.has(p.id);
   if (tab === "b2b") return B2B_SOLUTION_SAAS_PROJECT_IDS.has(p.id);
   return false;
 }
