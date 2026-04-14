@@ -250,7 +250,7 @@ function ProjectCard({
           src={p.image}
           alt=""
           fill
-          className="object-cover object-top [transform:translateZ(0)]"
+          className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.045] motion-reduce:transition-none motion-reduce:group-hover:scale-100 [transform:translateZ(0)]"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1536px) 33vw, (max-width: 2400px) 25vw, 400px"
         />
       </div>

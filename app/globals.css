@@ -87,7 +87,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  padding: 2px;
+  padding: 0;
   background: linear-gradient(135deg, #8b7cf7 0%, #6d5ef3 25%, #6366f1 50%, #a78bfa 75%, #f97316 100%);
   box-shadow:
     0 0 20px -4px rgba(109, 94, 243, 0.25),
@@ -118,8 +118,8 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: var(--background);
-  color: var(--text-primary);
+  background: transparent;
+  color: #fff;
 }
 
 /* Hero 블롭 회전 */
