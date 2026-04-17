@@ -77,7 +77,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     meta: "ESG · 리워드 플랫폼",
     detailImage: "/images/pf_happyhabit.png",
     detailDesignTypes: "App, UI/UX, Identity, Visual",
-    detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
+    detailTools: "Tool : Figma, XD, Photoshop, Illustrator, After Effects",
     detailDescription: `친환경 서비스 ‘해피해빗’ 앱 통합 구축 프로젝트에서 디자인 리드로 참여하여, 서비스 전반의 UI/UX 디자인을 4년간 전담했습니다.
 
 다양한 기능이 혼재되어 있던 기존 화면을 재구성하여, 사용자가 현재 상태와 다음 행동을 명확히 인지할 수 있도록 흐름을 개선했습니다.
