@@ -157,7 +157,7 @@ export function NewShowcaseClient() {
         </div>
 
         <p
-          className="mt-12 max-w-prose border-l-2 border-neutral-200 pl-3.5 text-[11px] leading-snug text-neutral-400 md:mt-14 md:text-[12px]"
+          className="mt-12 max-w-prose border-l-2 border-neutral-200 pl-3.5 text-[12px] leading-snug text-neutral-400 md:mt-14 md:text-[13px]"
           role="note"
         >
           기여도 100%에 가까운 프로젝트만 선별된 포트폴리오 입니다.

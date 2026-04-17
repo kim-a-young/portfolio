@@ -97,6 +97,37 @@ body {
     transform 0.2s ease;
 }
 
+.showcase-chat-fab-ring--animate {
+  animation: showcase-chat-fab-drop-in 0.96s cubic-bezier(0.2, 0.95, 0.28, 1.02) 0.08s both;
+}
+
+@keyframes showcase-chat-fab-drop-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-170px) scale(0.8);
+  }
+  56% {
+    opacity: 1;
+    transform: translateY(12px) scale(1.02);
+  }
+  68% {
+    transform: translateY(-8px) scale(0.99);
+  }
+  78% {
+    transform: translateY(5px) scale(1.005);
+  }
+  87% {
+    transform: translateY(-3px) scale(0.998);
+  }
+  94% {
+    transform: translateY(1px) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .showcase-chat-fab-ring:hover {
   box-shadow:
     0 0 26px -3px rgba(109, 94, 243, 0.38),
@@ -231,6 +262,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .showcase-chat-fab-ring--animate {
+    animation: none;
+  }
+
   .intro-spline-stage {
     animation: none;
     opacity: 1;

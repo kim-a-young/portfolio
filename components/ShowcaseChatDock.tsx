@@ -26,6 +26,7 @@ const SHOWCASE_GREETING =
 
 export function ShowcaseChatDock() {
   const [open, setOpen] = useState(false);
+  const [fabAnimating, setFabAnimating] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: SHOWCASE_GREETING },
   ]);
@@ -59,6 +60,13 @@ export function ShowcaseChatDock() {
     const el = scrollContainerRef.current;
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior });
+  }, []);
+
+  const triggerFabAnimation = useCallback(() => {
+    setFabAnimating(false);
+    window.requestAnimationFrame(() => {
+      setFabAnimating(true);
+    });
   }, []);
 
   const resetConversation = useCallback(() => {
@@ -111,6 +119,10 @@ export function ShowcaseChatDock() {
       setMessages(saved.messages);
     }
   }, []);
+
+  useEffect(() => {
+    triggerFabAnimation();
+  }, [triggerFabAnimation]);
 
   useEffect(() => {
     if (!open) return;
@@ -433,7 +445,9 @@ export function ShowcaseChatDock() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="showcase-chat-fab-ring fixed bottom-5 right-5 z-[40] h-14 w-14 md:bottom-7 md:right-7"
+        className={`showcase-chat-fab-ring fixed bottom-5 right-5 z-[40] h-14 w-14 md:bottom-7 md:right-7 ${
+          fabAnimating ? "showcase-chat-fab-ring--animate" : ""
+        }`}
         aria-expanded={open}
         aria-controls="showcase-chat-panel"
         aria-label={open ? "채팅 닫기" : "채팅 열기"}
