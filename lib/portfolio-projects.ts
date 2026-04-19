@@ -87,20 +87,6 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
 서비스 확장 과정에서 사용자 흐름을 정교하게 다듬고, 애니메이션을 추가해 나가며 해피해빗이 ‘의무’가 아닌 ‘즐거운 경험’으로 인식되도록 고도화 해나갔습니다.`,
   },
   {
-    id: 20,
-    name: "MONOPLEX POS 시스템 구축",
-    url: "#",
-    image: MONOPLEX_THUM,
-    accent: "#166534",
-    meta: "오프라인 · 시스템",
-    detailImage: MONOPLEX_DETAIL1,
-    detailDesignTypes: "Kiosk, UI/UX, Dark Mode, Payment Flow",
-    detailTools: "Tool : Figma, Photoshop, Illustrator",
-    detailDescription: `모노플렉스의 통합 결제 및 관리 시스템 구축 디자인을 전담하였습니다.
-
-직관적인 UI와 다크 모드를 적용하여 시인성을 높이고 사용자 결제 동선을 최적화했습니다.`,
-  },
-  {
     id: 3,
     name: "대한적십자 헌혈앱 고도화",
     url: "#",
@@ -120,6 +106,41 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
 또한 기존 UI 패턴을 유지하면서 일관성을 유지하고, 백오피스 설계에 참여하여 운영 효율성과 관리 편의성을 고려한 서비스 구축에 기여하였습니다.
 
 그 결과, 접근성 인증 마크를 획득하며 서비스 신뢰도를 강화하였고, 예약부터 발급까지 이어지는 비대면 헌혈 서비스 경험을 보다 안정적으로 제공할 수 있도록 개선하였습니다.`,
+  },
+  {
+    id: 23,
+    name: "SK Tech 아카데미 사이트 구축",
+    url: "#",
+    image: "/images/sta_thum.png",
+    accent: "#0284c7",
+    meta: "교육 · 웹",
+    detailImage: "/images/sta_thum.png",
+    detailImages: [
+      "/images/sta_thum.png",
+      "/images/sta_detail1.png",
+      "/images/sta_detail2.png",
+    ],
+    detailDesignTypes: "Web, UI/UX, Responsive",
+    detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
+    detailDescription: `디지털 융합 인재 양성·체험 플랫폼을 전체 리뉴얼 했습니다.
+
+플랫폼의 성격을 반영한 디자인 컨셉 수립과 메인 및 주요 화면, 스타일 가이드를 메인디자이너로서 담당했습니다.
+
+실제 교육 현장 이미지를 활용해 서비스의 생동감을 전달하고, 교육·체험 정보와 예약 흐름을 직관적으로 설계해 사용 편의성을 높였습니다.`,
+  },
+  {
+    id: 20,
+    name: "MONOPLEX POS 시스템 구축",
+    url: "#",
+    image: MONOPLEX_THUM,
+    accent: "#166534",
+    meta: "오프라인 · 시스템",
+    detailImage: MONOPLEX_DETAIL1,
+    detailDesignTypes: "Kiosk, UI/UX, Dark Mode, Payment Flow",
+    detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
+    detailDescription: `모노플렉스의 통합 결제 및 관리 시스템 구축 디자인을 전담하였습니다.
+
+직관적인 UI와 다크 모드를 적용하여 시인성을 높이고 사용자 결제 동선을 최적화했습니다.`,
   },
   {
     id: 4,
