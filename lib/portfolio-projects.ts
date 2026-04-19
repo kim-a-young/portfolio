@@ -113,7 +113,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/sta_thum.png",
     accent: "#0284c7",
-    meta: "교육 · 웹",
+    meta: "교육",
     detailImage: "/images/sta_thum.png",
     detailImages: [
       "/images/sta_thum.png",
