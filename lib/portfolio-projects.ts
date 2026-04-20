@@ -113,7 +113,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/sta_thum.png",
     accent: "#0284c7",
-    meta: "교육",
+    meta: "교육 · 에듀테크",
     detailImage: "/images/sta_thum.png",
     detailImages: [
       "/images/sta_thum.png",
@@ -214,7 +214,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     url: "#",
     image: "/images/pf_heypoll_m.png",
     accent: "#C52AD9", // 보라/핑크 계열 고정 컬러
-    meta: "리워드 · 사용자 참여",
+    meta: "리워드 · 플랫폼",
     detailDesignTypes: "App, UI/UX, Promotions",
     detailTools: "Tool : Photoshop, Illustrator",
     detailDescription: `리워드 기반 설문 참여 플랫폼 '헤이폴'은 사용자의 의견 참여를 콘텐츠화하고 포인트 보상을 통해 반복 사용을 유도하는 서비스로, 앱 런칭 단계에서 신규 BI를 반영한 UI 구축이 중요한 프로젝트였습니다.

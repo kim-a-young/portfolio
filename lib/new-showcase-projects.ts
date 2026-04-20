@@ -28,6 +28,37 @@ const STA_GALLERY_IMAGES = [
   `/images/sta_detail2.png?v=${STA_ASSET_VER}`,
 ] as const;
 
+/** KB손해보험 상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const KB_ASSET_VER = "1";
+const KB_GALLERY_IMAGES = [
+  `/images/pf_kb_m.png?v=${KB_ASSET_VER}`,
+  `/images/kb_detail1.png?v=${KB_ASSET_VER}`,
+] as const;
+
+/** 정관장몰 상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const JUNG_ASSET_VER = "1";
+const JUNG_GALLERY_IMAGES = [
+  `/images/pf_kgcshop_m.png?v=${JUNG_ASSET_VER}`,
+  `/images/jung_detail1.png?v=${JUNG_ASSET_VER}`,
+  `/images/jung_detail2.png?v=${JUNG_ASSET_VER}`,
+  `/images/jung_detail3.png?v=${JUNG_ASSET_VER}`,
+  `/images/jung_detail4.png?v=${JUNG_ASSET_VER}`,
+] as const;
+
+/** 영진전문대 상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const YJU_ASSET_VER = "1";
+const YJU_GALLERY_IMAGES = [
+  `/images/pf_yju_m.png?v=${YJU_ASSET_VER}`,
+  `/images/yju_detail1.png?v=${YJU_ASSET_VER}`,
+] as const;
+
+/** LG OLED SPACE 상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const OLED_ASSET_VER = "1";
+const OLED_GALLERY_IMAGES = [
+  `/images/pf_oled_m.png?v=${OLED_ASSET_VER}`,
+  `/images/oled_detail1.png?v=${OLED_ASSET_VER}`,
+] as const;
+
 /**
  * /v2 쇼케이스 탭 전용 프로젝트 목록.
  * `SHOWCASE_PROJECTS`와 이미지·상세 갤러리 경로를 분리해 관리합니다.
@@ -79,6 +110,34 @@ export const NEW_SHOWCASE_PROJECTS: ProjectItem[] = SHOWCASE_PROJECTS.map((p) =>
       ...p,
       image: STA_THUM,
       detailImages: [...STA_GALLERY_IMAGES],
+    };
+  }
+  if (p.id === 6) {
+    return {
+      ...p,
+      image: KB_GALLERY_IMAGES[0],
+      detailImages: [...KB_GALLERY_IMAGES],
+    };
+  }
+  if (p.id === 9) {
+    return {
+      ...p,
+      image: JUNG_GALLERY_IMAGES[0],
+      detailImages: [...JUNG_GALLERY_IMAGES],
+    };
+  }
+  if (p.id === 10) {
+    return {
+      ...p,
+      image: YJU_GALLERY_IMAGES[0],
+      detailImages: [...YJU_GALLERY_IMAGES],
+    };
+  }
+  if (p.id === 8) {
+    return {
+      ...p,
+      image: OLED_GALLERY_IMAGES[0],
+      detailImages: [...OLED_GALLERY_IMAGES],
     };
   }
   if (p.id === 5) {
