@@ -58,6 +58,13 @@ const OLED_GALLERY_IMAGES = [
   `/images/oled_detail1.png?v=${OLED_ASSET_VER}`,
 ] as const;
 
+/** 헤이폴 상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const HEYPOLL_ASSET_VER = "1";
+const HEYPOLL_GALLERY_IMAGES = [
+  `/images/pf_heypoll_m.png?v=${HEYPOLL_ASSET_VER}`,
+  `/images/heypoll_detail1.png?v=${HEYPOLL_ASSET_VER}`,
+] as const;
+
 /** /v2 그리드 상단 노출 순서 (해피해빗 → 항공포털 → 레드커넥트 → MONOPLEX → SK Tech 아카데미). */
 const V2_LEADING_PROJECT_IDS: readonly number[] = [2, 1, 3, 20, 23];
 
@@ -134,6 +141,13 @@ const NEW_SHOWCASE_PROJECTS_MAPPED: ProjectItem[] = SHOWCASE_PROJECTS.map((p) =>
       ...p,
       image: OLED_GALLERY_IMAGES[0],
       detailImages: [...OLED_GALLERY_IMAGES],
+    };
+  }
+  if (p.id === 7) {
+    return {
+      ...p,
+      image: HEYPOLL_GALLERY_IMAGES[0],
+      detailImages: [...HEYPOLL_GALLERY_IMAGES],
     };
   }
   if (p.id === 5) {
