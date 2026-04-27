@@ -31,7 +31,7 @@ const MAINTENANCE_PROJECT_IDS = new Set<number>([1, 2, 22, 6]);
 
 /** ERP·OMS·SCM·내부 시스템·관제·엔터프라이즈 도구 (Maintenance과 중복 허용) */
 const B2B_SOLUTION_SAAS_PROJECT_IDS = new Set<number>([
-  12, 13, 14, 15, 20, 21, 22,
+  12, 13, 14, 15, 20, 22,
 ]);
 
 function projectMatchesTab(

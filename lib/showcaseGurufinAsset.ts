@@ -2,3 +2,4 @@
 export const GURUFIN_THUM_VER = "1";
 
 export const GURUFIN_THUM = `/images/gurufin_thum.png?v=${GURUFIN_THUM_VER}`;
+export const GURUFIN_DETAIL1 = `/images/gurufin__detail1.png?v=${GURUFIN_THUM_VER}`;

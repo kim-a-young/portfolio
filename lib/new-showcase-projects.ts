@@ -3,9 +3,8 @@ import { SHOWCASE_PROJECTS } from "./portfolio-projects";
 import { HABITICT_IMAGES, HABITICT_THUM } from "./showcaseHabitictAsset";
 import { MONOPLEX_DETAIL1, MONOPLEX_THUM } from "./showcaseMonoplexAsset";
 import { REDCONNECT_IMAGES, REDCONNECT_THUM } from "./showcaseRedconnectAsset";
-import { GURUFIN_THUM } from "./showcaseGurufinAsset";
+import { GURUFIN_DETAIL1, GURUFIN_THUM } from "./showcaseGurufinAsset";
 import { AIRPORTAL_IMAGES } from "./showcaseAirportalAsset";
-import { RTC_THUM } from "./showcaseRtcAsset";
 
 /** 해피해빗 썸네일·상세 이미지 교체 시 숫자만 올리세요. */
 const HAPPYHABIT_ASSET_VER = "1";
@@ -59,22 +58,19 @@ const OLED_GALLERY_IMAGES = [
   `/images/oled_detail1.png?v=${OLED_ASSET_VER}`,
 ] as const;
 
+/** /v2 그리드 상단 노출 순서 (해피해빗 → 항공포털 → 레드커넥트 → MONOPLEX → SK Tech 아카데미). */
+const V2_LEADING_PROJECT_IDS: readonly number[] = [2, 1, 3, 20, 23];
+
 /**
  * /v2 쇼케이스 탭 전용 프로젝트 목록.
  * `SHOWCASE_PROJECTS`와 이미지·상세 갤러리 경로를 분리해 관리합니다.
  */
-export const NEW_SHOWCASE_PROJECTS: ProjectItem[] = SHOWCASE_PROJECTS.map((p) => {
+const NEW_SHOWCASE_PROJECTS_MAPPED: ProjectItem[] = SHOWCASE_PROJECTS.map((p) => {
   if (p.id === 1) {
     return {
       ...p,
       image: AIRPORTAL_IMAGES[0],
       detailImages: [...AIRPORTAL_IMAGES],
-    };
-  }
-  if (p.id === 21) {
-    return {
-      ...p,
-      image: RTC_THUM,
     };
   }
   if (p.id === 2) {
@@ -144,7 +140,7 @@ export const NEW_SHOWCASE_PROJECTS: ProjectItem[] = SHOWCASE_PROJECTS.map((p) =>
     return {
       ...p,
       image: GURUFIN_THUM,
-      detailImages: [GURUFIN_THUM],
+      detailImages: [GURUFIN_THUM, GURUFIN_DETAIL1],
     };
   }
   if (p.id !== 4) return p;
@@ -159,3 +155,19 @@ export const NEW_SHOWCASE_PROJECTS: ProjectItem[] = SHOWCASE_PROJECTS.map((p) =>
     ],
   };
 });
+
+const V2_HIDDEN_PROJECT_IDS = new Set<number>([21]);
+
+const byId = new Map(NEW_SHOWCASE_PROJECTS_MAPPED.map((p) => [p.id, p]));
+const leading = V2_LEADING_PROJECT_IDS.map((id) => byId.get(id)).filter(
+  (p): p is ProjectItem => p != null
+);
+const leadingIdSet = new Set(V2_LEADING_PROJECT_IDS);
+const rest = NEW_SHOWCASE_PROJECTS_MAPPED.filter(
+  (p) => !V2_HIDDEN_PROJECT_IDS.has(p.id) && !leadingIdSet.has(p.id)
+);
+
+/**
+ * 다중 비행장 원격 통합 관제(id 21)는 노출하지 않습니다.
+ */
+export const NEW_SHOWCASE_PROJECTS: ProjectItem[] = [...leading, ...rest];
