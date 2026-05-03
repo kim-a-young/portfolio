@@ -272,21 +272,21 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
 또한 PC와 모바일 환경을 고려한 반응형 웹 디자인을 적용하여 다양한 디바이스에서도 일관된 정보 전달이 가능하도록 UI를 구축하였습니다.`,
   },
   {
-    id: 11,
-    name: "전통시장화재공제 사이트 구축",
+    id: 24,
+    name: "LG U+ SIS 전략정보시스템 구축",
     url: "#",
-    image: "/images/pf_semas_m.png",
-    accent: "#ea580c", // 오렌지
-    meta: "공공 · 보험",
-    detailDesignTypes: "Web, Design System",
-    detailTools: "Tool : Photoshop, Illustrator",
-    detailDescription: `전통시장화재공제 웹사이트는 전통시장 상인을 대상으로 화재 피해를 대비할 수 있는 공제 제도를 안내하고 가입을 유도하는 공공 서비스 플랫폼으로, 복잡한 제도를 쉽고 직관적으로 전달하는 것이 중요한 프로젝트였습니다.
+    image: "/images/lgsis_thum.png",
+    accent: "#1e3a5f",
+    meta: "기업 · 솔루션",
+    detailImage: "/images/lgsis_thum.png",
+    detailImages: ["/images/lgsis_thum.png", "/images/lgsis_detail1.png"],
+    detailDesignTypes: "System, Data",
+    detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
+    detailDescription: `LG U+ SIS 전략정보시스템 구축 프로젝트에서 UI·화면 설계를 담당하였습니다.
 
-사용자의 이해도를 높이기 위해 정보 구조를 단순화하고, 공제 개념과 가입 절차를 직관적으로 전달할 수 있도록 전체 페이지 UI를 설계하였습니다. 특히 가입 과정에서의 진입 장벽을 낮추기 위해 단계별 흐름을 간소화하고, 사용자가 자연스럽게 선택하며 진행할 수 있는 인터페이스를 구성하였습니다.
+조직의 전략적 목표 달성을 지원할 수 있도록 핵심 지표와 현황을 한눈에 파악할 수 있는 대시보드 중심의 정보 구조를 설계하였습니다. 분산된 정보를 빠르고 정확하게 이해할 수 있도록 우선순위와 위계를 정리하고, 의사결정에 필요한 맥락이 드러나도록 화면을 구성하였습니다.
 
-또한 디자인 가이드를 수립하여 퍼블리싱 및 개발 과정에서도 일관된 UI가 유지될 수 있도록 기반을 마련하고, 서비스 전반에 걸쳐 안정적인 디자인 품질을 유지할 수 있도록 하였습니다.
-
-그 결과, 복잡한 공제 서비스에 대한 이해도를 높이는 접근성 웹사이트를 구축하였으며, 사용자 친화적인 가입 흐름을 통해 서비스 이용 활성화에 기여할 수 있는 기반을 마련하였습니다.`,
+데이터를 직관적으로 읽을 수 있도록 시각화 패턴과 컴포넌트를 일관되게 정의하여 지표·추세가 동일한 원칙으로 표현되도록 하였고, 시계열·비교 등 추세 분석에 적합한 그래프·표현 방식을 적용하여 변화와 흐름을 쉽게 해석할 수 있도록 다듬었습니다.`,
   },
   {
     id: 13,
@@ -295,6 +295,12 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_skncar_m.jpg?v=5",
     accent: "#ea580c", // 오렌지 (기존 다크 브라운보다 밝게, 다른 프로젝트 톤과 맞춤)
     meta: "기업 · 시스템",
+    detailImage: "/images/pf_skncar_m.jpg?v=5",
+    detailImages: [
+      "/images/pf_skncar_m.jpg?v=5",
+      "/images/skncar_detail1.png",
+      "/images/skncar_detail2.png",
+    ],
     detailDesignTypes: "Design System, Publishing",
     detailTools: "Tool : Nexacro, Photoshop, Illustrator",
     detailDescription: `SK엔카의 사업 운영을 지원하는 내부 관리 시스템은 방대한 거래 데이터와 지점별 운영 현황을 효율적으로 관리하는 것이 중요한 플랫폼으로, 분산된 업무 환경에서도 일관된 사용 경험과 높은 가독성에 집중하였습니다.
@@ -310,6 +316,12 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     image: "/images/pf_miraeasset_m.png",
     accent: "#1d4ed8", // 블루
     meta: "금융 · 시스템",
+    detailImage: "/images/pf_miraeasset_m.png",
+    detailImages: [
+      "/images/pf_miraeasset_m.png",
+      "/images/miraeasset_detail1.png",
+      "/images/miraeasset_detail2.png",
+    ],
     detailDesignTypes: "Design System, Publishing",
     detailTools: "Tool : Nexacro, Photoshop, Illustrator",
     detailDescription: `미래에셋증권의 OMS(Order Management System)는 대량의 금융 데이터를 기반으로 빠른 의사결정과 정확한 업무 처리가 요구되는 내부 업무 시스템으로, 장시간 사용 환경에서도 효율적이고 일관된 UI를 제공하는 것이 중요한 프로젝트였습니다.
@@ -319,6 +331,23 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
 더불어 시스템 전반에 적용 가능한 디자인 가이드를 수립하여 화면 간 일관성을 유지하고, 반복 업무에 대한 학습 부담을 줄일 수 있도록 UI 표준을 정리하였습니다.
 
 그 결과, 사용자 맞춤형 UI 환경을 통해 업무 몰입도와 처리 효율을 향상시켰으며, 데이터 중심 업무에 적합한 정보 구조와 인터페이스를 기반으로 빠른 정보 파악과 의사결정을 지원할 수 있는 확장 가능한 시스템을 구축하였습니다.`,
+  },
+  {
+    id: 11,
+    name: "전통시장화재공제 사이트 구축",
+    url: "#",
+    image: "/images/pf_semas_m.png",
+    accent: "#ea580c", // 오렌지
+    meta: "공공 · 보험",
+    detailDesignTypes: "Web, Design System",
+    detailTools: "Tool : Photoshop, Illustrator",
+    detailDescription: `전통시장화재공제 웹사이트는 전통시장 상인을 대상으로 화재 피해를 대비할 수 있는 공제 제도를 안내하고 가입을 유도하는 공공 서비스 플랫폼으로, 복잡한 제도를 쉽고 직관적으로 전달하는 것이 중요한 프로젝트였습니다.
+
+사용자의 이해도를 높이기 위해 정보 구조를 단순화하고, 공제 개념과 가입 절차를 직관적으로 전달할 수 있도록 전체 페이지 UI를 설계하였습니다. 특히 가입 과정에서의 진입 장벽을 낮추기 위해 단계별 흐름을 간소화하고, 사용자가 자연스럽게 선택하며 진행할 수 있는 인터페이스를 구성하였습니다.
+
+또한 디자인 가이드를 수립하여 퍼블리싱 및 개발 과정에서도 일관된 UI가 유지될 수 있도록 기반을 마련하고, 서비스 전반에 걸쳐 안정적인 디자인 품질을 유지할 수 있도록 하였습니다.
+
+그 결과, 복잡한 공제 서비스에 대한 이해도를 높이는 접근성 웹사이트를 구축하였으며, 사용자 친화적인 가입 흐름을 통해 서비스 이용 활성화에 기여할 수 있는 기반을 마련하였습니다.`,
   },
   {
     id: 12,
@@ -387,7 +416,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
  * 카드 번호 02·04·06에 해당하던 항목(id 21, 22, 20)은 /v2 이후 추가 분위기로 메인에서 제외.
  */
 const MAIN_MENU_PROJECT_ORDER: number[] = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 12, 14, 16, 17, 18, 19,
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 24, 11, 13, 15, 12, 14, 16, 17, 18, 19,
 ];
 
 /**

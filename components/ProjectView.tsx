@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type TransitionEvent,
+} from "react";
 import Image from "next/image";
 import { PROJECTS, type ProjectItem } from "@/lib/portfolio-projects";
 
@@ -86,6 +93,201 @@ function ProjectDetailDescriptionBlock({ project }: { project: ProjectItem }) {
         leftColumn
       )}
     </section>
+  );
+}
+
+function appendImageCacheParam(src: string, cacheBust: number): string {
+  const sep = src.includes("?") ? "&" : "?";
+  return `${src}${sep}v=${cacheBust}`;
+}
+
+function MainProjectDetailGalleryCarousel({
+  slides,
+  alt,
+}: {
+  slides: string[];
+  alt: string;
+}) {
+  const touchStartX = useRef<number | null>(null);
+  const slideSig = slides.join("|");
+  const n = slides.length;
+
+  const extended = useMemo(() => {
+    if (n <= 1) return slides;
+    return [slides[n - 1]!, ...slides, slides[0]!];
+  }, [slides, n]);
+
+  const nExt = extended.length;
+  const stepPct = nExt > 0 ? 100 / nExt : 100;
+
+  const [pos, setPos] = useState(1);
+  const [transitionOn, setTransitionOn] = useState(true);
+
+  useEffect(() => {
+    setPos(1);
+    setTransitionOn(true);
+  }, [slideSig]);
+
+  const jumpWithoutTransition = useCallback((nextPos: number) => {
+    setTransitionOn(false);
+    setPos(nextPos);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTransitionOn(true));
+    });
+  }, []);
+
+  const go = useCallback(
+    (delta: number) => {
+      if (n <= 1) return;
+      setPos((p) => p + delta);
+    },
+    [n]
+  );
+
+  useEffect(() => {
+    if (n <= 1) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go(-1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go(1);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [n, slideSig, go]);
+
+  const onTrackTransitionEnd = useCallback(
+    (e: TransitionEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget) return;
+      if (e.propertyName !== "transform") return;
+      if (n <= 1) return;
+      if (pos === nExt - 1) {
+        jumpWithoutTransition(1);
+      } else if (pos === 0) {
+        jumpWithoutTransition(n);
+      }
+    },
+    [n, nExt, pos, jumpWithoutTransition]
+  );
+
+  const dotActiveIndex =
+    n <= 1 ? 0 : pos === 0 ? n - 1 : pos === nExt - 1 ? 0 : pos - 1;
+
+  const goToSlide = useCallback(
+    (slideIndex: number) => {
+      if (n <= 1) return;
+      setTransitionOn(true);
+      setPos(slideIndex + 1);
+    },
+    [n]
+  );
+
+  const [pauseRoll, setPauseRoll] = useState(false);
+
+  useEffect(() => {
+    if (n <= 1 || pauseRoll) return;
+    const id = window.setInterval(() => go(1), 5000);
+    return () => window.clearInterval(id);
+  }, [n, slideSig, go, pauseRoll]);
+
+  if (n === 1) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={slides[0]}
+        alt={alt}
+        className="h-auto w-full object-contain"
+        decoding="async"
+      />
+    );
+  }
+
+  return (
+    <div
+      className="relative w-full"
+      onMouseEnter={() => setPauseRoll(true)}
+      onMouseLeave={() => setPauseRoll(false)}
+    >
+      <div className="overflow-hidden">
+        <div
+          className={`flex ${transitionOn ? "duration-300 ease-out transition-transform" : ""}`}
+          style={{
+            width: `${nExt * 100}%`,
+            transform: `translateX(-${pos * stepPct}%)`,
+          }}
+          onTransitionEnd={onTrackTransitionEnd}
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0].clientX;
+          }}
+          onTouchEnd={(e) => {
+            const start = touchStartX.current;
+            touchStartX.current = null;
+            if (start == null) return;
+            const dx = e.changedTouches[0].clientX - start;
+            if (dx > 60) go(-1);
+            else if (dx < -60) go(1);
+          }}
+        >
+          {extended.map((src, i) => (
+            <div
+              key={`${slideSig}-${i}-${src}`}
+              className="flex shrink-0 items-center justify-center bg-black/15 px-2 py-4"
+              style={{ width: `${stepPct}%` }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt=""
+                className="max-h-[min(85vh,1400px)] w-auto max-w-full object-contain"
+                decoding={i === 1 ? "sync" : "async"}
+                loading={i === 1 ? "eager" : "lazy"}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-1 sm:px-2">
+        <button
+          type="button"
+          onClick={() => go(-1)}
+          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-zinc-100 backdrop-blur-md transition-colors hover:bg-white/20"
+          aria-label="이전 이미지"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          onClick={() => go(1)}
+          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-zinc-100 backdrop-blur-md transition-colors hover:bg-white/20"
+          aria-label="다음 이미지"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="mt-4 flex justify-center gap-1.5">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => goToSlide(i)}
+            className={`h-2 w-2 rounded-full transition-colors ${
+              i === dotActiveIndex ? "bg-white shadow" : "bg-white/40 hover:bg-white/60"
+            }`}
+            aria-label={`이미지 ${i + 1} / ${n}`}
+            aria-current={i === dotActiveIndex}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -264,6 +466,14 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
   const openProjectIndex = openProject
     ? PROJECTS.findIndex((p) => p.id === openProject.id)
     : -1;
+
+  const detailCarouselSlides = openProject
+    ? (openProject.detailImages?.filter(Boolean).length ?? 0) >= 2
+      ? openProject.detailImages!.filter(Boolean).map((src) =>
+          appendImageCacheParam(src, cacheBust)
+        )
+      : null
+    : null;
 
   useEffect(() => {
     if (!openProject || !modalScrollRef.current) return;
@@ -656,20 +866,30 @@ export function ProjectView({ projectId, sidebarOpen = false }: ProjectViewProps
                   )}
                 </div>
 
-                <Image
-                  src={`${
-                    openProject.detailImage ?? openProject.image
-                  }?v=${cacheBust}`}
-                  alt={openProject.name}
-                  width={1600}
-                  height={4000}
-                  className="h-auto w-full object-contain"
-                  priority
-                  unoptimized
-                />
+                {detailCarouselSlides ? (
+                  <MainProjectDetailGalleryCarousel
+                    slides={detailCarouselSlides}
+                    alt={openProject.name}
+                  />
+                ) : (
+                  <Image
+                    src={appendImageCacheParam(
+                      openProject.detailImage ?? openProject.image,
+                      cacheBust
+                    )}
+                    alt={openProject.name}
+                    width={1600}
+                    height={4000}
+                    className="h-auto w-full object-contain"
+                    priority
+                    unoptimized
+                  />
+                )}
 
-                {!openProject.detailImage &&
-                  projectHasDetailWriteup(openProject) && (
+                {projectHasDetailWriteup(openProject) &&
+                  (!openProject.detailImage ||
+                    (openProject.detailImages?.filter(Boolean).length ?? 0) >=
+                      2) && (
                     <ProjectDetailDescriptionBlock project={openProject} />
                   )}
               </div>

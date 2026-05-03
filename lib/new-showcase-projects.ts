@@ -51,6 +51,14 @@ const YJU_GALLERY_IMAGES = [
   `/images/yju_detail1.png?v=${YJU_ASSET_VER}`,
 ] as const;
 
+/** LG SIS 썸네일·상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const LGSIS_ASSET_VER = "1";
+const LGSIS_THUM = `/images/lgsis_thum.png?v=${LGSIS_ASSET_VER}`;
+const LGSIS_GALLERY_IMAGES = [
+  LGSIS_THUM,
+  `/images/lgsis_detail1.png?v=${LGSIS_ASSET_VER}`,
+] as const;
+
 /** LG OLED SPACE 상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
 const OLED_ASSET_VER = "1";
 const OLED_GALLERY_IMAGES = [
@@ -134,6 +142,13 @@ const NEW_SHOWCASE_PROJECTS_MAPPED: ProjectItem[] = SHOWCASE_PROJECTS.map((p) =>
       ...p,
       image: YJU_GALLERY_IMAGES[0],
       detailImages: [...YJU_GALLERY_IMAGES],
+    };
+  }
+  if (p.id === 24) {
+    return {
+      ...p,
+      image: LGSIS_THUM,
+      detailImages: [...LGSIS_GALLERY_IMAGES],
     };
   }
   if (p.id === 8) {
