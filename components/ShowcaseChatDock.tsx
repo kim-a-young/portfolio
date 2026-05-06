@@ -440,6 +440,11 @@ export function ShowcaseChatDock() {
     handleSubmit(question);
   };
 
+  const hasPinnedGreeting =
+    messages[0]?.role === "assistant" &&
+    messages[0]?.content === SHOWCASE_GREETING;
+  const conversationStartIndex = hasPinnedGreeting ? 1 : 0;
+
   return (
     <>
       <button
@@ -484,16 +489,17 @@ export function ShowcaseChatDock() {
       {open ? (
         <div
           id="showcase-chat-panel"
+          data-theme="light"
           role="dialog"
           aria-modal="false"
-          aria-label="동료 AI 채팅"
-          className="fixed bottom-[5.25rem] right-5 z-[40] flex h-[min(520px,calc(100dvh-8rem))] w-[min(100vw-2rem,420px)] flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-[var(--main-bg)] shadow-2xl md:bottom-[5.5rem] md:right-7"
+          aria-label="동료봇 🤖 채팅"
+          className="fixed bottom-[5.25rem] right-5 z-[40] flex h-[min(520px,calc(100dvh-8rem))] w-[min(100vw-2rem,420px)] flex-col overflow-hidden rounded-2xl bg-[var(--main-bg)] shadow-[0_24px_70px_rgba(15,23,42,0.28)] [--background:#FFFFFF] [--subtle-gray:#EFEFF1] [--border:#E5E7EB] [--text-primary:#0F111D] [--text-secondary:#6B7280] [--accent:#6D5EF3] [--main-bg:#FFFFFF] [--pill-bg:#EFEFF1] md:bottom-[5.5rem] md:right-7"
         >
-          <div className="flex shrink-0 items-center justify-between border-b border-neutral-100 px-4 py-3">
+          <div className="flex shrink-0 items-center justify-between border-b border-neutral-100/70 px-4 py-3">
             <p
               className={`${SHOWCASE_CHAT_TITLE_CLASS} font-semibold text-neutral-900`}
             >
-              동료 AI
+              동료봇 🤖
             </p>
             <div className="flex items-center gap-0.5">
               <button
@@ -541,19 +547,57 @@ export function ShowcaseChatDock() {
 
           <div
             ref={scrollContainerRef}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-3 py-3"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain bg-neutral-50/70 px-3 py-3"
           >
             <div className="pb-2">
-              {messages.map((msg, i) => {
+              {hasPinnedGreeting ? (
+                <ChatMessage
+                  compactFont
+                  forceLightTheme
+                  role={messages[0]!.role}
+                  content={messages[0]!.content}
+                  showProfilePhoto={messages[0]!.showProfilePhoto === true}
+                  isTyping={typingMessageIndex === 0}
+                  isStreaming={streamingAssistantIndex === 0}
+                  interviewerQuestions={messages[0]!.interviewerQuestions}
+                  showInterviewerPrompt={assistantMessageWithPrompt === 0 && !isSubmitting}
+                  isLoadingQuestions={loadingQuestions.has(0)}
+                  isPromptExpanded={expandedPrompts.has(0)}
+                  onInterviewerPromptClick={() => handleInterviewerPromptClick(0)}
+                  onQuestionClick={(question) => handleQuestionClick(question)}
+                  onAssistantStreamComplete={() => {
+                    setAssistantRevealBusyIndex((prev) => (prev === 0 ? null : prev));
+                    setTypingMessageIndex(null);
+                    queueMicrotask(() => {
+                      persistMessages(messagesRef.current);
+                    });
+                    setTimeout(() => scrollPanelToBottom("smooth"), 100);
+                  }}
+                />
+              ) : null}
+              <div className="mt-3 flex justify-start">
+                <KeywordPills
+                  compact
+                  forceLightTheme
+                  pillTextClassName={SHOWCASE_CHAT_TAB_CLASS}
+                  onSelect={handleKeywordSelect}
+                  disabled={isSubmitting}
+                />
+              </div>
+              {messages.slice(conversationStartIndex).map((msg, i) => {
+                const realIndex = i + conversationStartIndex;
                 const isAssistantMessage = msg.role === "assistant";
                 const showPrompt =
                   isAssistantMessage &&
-                  assistantMessageWithPrompt === i &&
+                  assistantMessageWithPrompt === realIndex &&
                   !isSubmitting;
-                const isLoading = isAssistantMessage && loadingQuestions.has(i);
-                const isExpanded = isAssistantMessage && expandedPrompts.has(i);
+                const isLoading =
+                  isAssistantMessage && loadingQuestions.has(realIndex);
+                const isExpanded =
+                  isAssistantMessage && expandedPrompts.has(realIndex);
 
-                const prevMessage = i > 0 ? messages[i - 1] : null;
+                const prevMessage =
+                  realIndex > 0 ? messages[realIndex - 1] : null;
                 const isSetBreak =
                   prevMessage?.role === "assistant" && msg.role === "user";
                 const isQuestionAnswer =
@@ -562,12 +606,13 @@ export function ShowcaseChatDock() {
                 let marginClass = "";
                 if (isSetBreak) marginClass = "mt-[48px]";
                 else if (isQuestionAnswer) marginClass = "mt-[20px]";
-                else if (i > 0) marginClass = "mt-3";
+                else marginClass = "mt-3";
 
                 return (
-                  <div key={i} className={marginClass}>
+                  <div key={realIndex} className={marginClass}>
                     <ChatMessage
                       compactFont
+                      forceLightTheme
                       role={msg.role}
                       content={msg.content}
                       showProfilePhoto={
@@ -576,10 +621,12 @@ export function ShowcaseChatDock() {
                           : false
                       }
                       isTyping={
-                        typingMessageIndex === i && msg.role === "assistant"
+                        typingMessageIndex === realIndex &&
+                        msg.role === "assistant"
                       }
                       isStreaming={
-                        streamingAssistantIndex === i && msg.role === "assistant"
+                        streamingAssistantIndex === realIndex &&
+                        msg.role === "assistant"
                       }
                       interviewerQuestions={
                         isAssistantMessage ? msg.interviewerQuestions : undefined
@@ -589,7 +636,7 @@ export function ShowcaseChatDock() {
                       isPromptExpanded={isExpanded}
                       onInterviewerPromptClick={
                         isAssistantMessage
-                          ? () => handleInterviewerPromptClick(i)
+                          ? () => handleInterviewerPromptClick(realIndex)
                           : undefined
                       }
                       onQuestionClick={(question) =>
@@ -599,7 +646,7 @@ export function ShowcaseChatDock() {
                         msg.role === "assistant"
                           ? () => {
                               setAssistantRevealBusyIndex((prev) =>
-                                prev === i ? null : prev
+                                prev === realIndex ? null : prev
                               );
                               setTypingMessageIndex(null);
                               queueMicrotask(() => {
@@ -633,8 +680,8 @@ export function ShowcaseChatDock() {
             </div>
           </div>
 
-          <div className="shrink-0 border-t border-neutral-100 bg-[var(--main-bg)] p-3">
-            <div className="flex flex-col gap-2">
+          <div className="mt-auto shrink-0 bg-neutral-50/70 p-3">
+            <div className="[&_.input-border-gradient-inner]:!bg-[var(--main-bg)]">
               <ChatInput
                 value={input}
                 onChange={setInput}
@@ -643,12 +690,6 @@ export function ShowcaseChatDock() {
                 disabled={isSubmitting}
                 compact
                 textSizeClass={SHOWCASE_CHAT_BODY_CLASS}
-              />
-              <KeywordPills
-                compact
-                pillTextClassName={SHOWCASE_CHAT_TAB_CLASS}
-                onSelect={handleKeywordSelect}
-                disabled={isSubmitting}
               />
             </div>
           </div>

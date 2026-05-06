@@ -97,6 +97,7 @@ function detailGallerySlides(p: ProjectItem): string[] {
  * HIVELAB WORK 참고: 흰 배경 · 해시 필터 · 카드(요약 없음) · 클릭 시 상세 팝업.
  */
 export function NewShowcaseClient() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [activeTab, setActiveTab] =
     useState<(typeof SHOWCASE_TABS)[number]["id"]>("all");
   const [detailProject, setDetailProject] = useState<ProjectItem | null>(null);
@@ -108,35 +109,82 @@ export function NewShowcaseClient() {
 
   const closeDetail = useCallback(() => setDetailProject(null), []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = window.localStorage.getItem("v2-showcase-theme");
+    if (saved === "light" || saved === "dark") {
+      setTheme(saved);
+      return;
+    }
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(prefersDark ? "dark" : "light");
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next = prev === "light" ? "dark" : "light";
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("v2-showcase-theme", next);
+      }
+      return next;
+    });
+  }, []);
+
   return (
-    <div className="min-h-svh bg-white text-neutral-900 antialiased">
+    <div
+      data-theme={theme}
+      className="min-h-svh bg-white text-neutral-900 antialiased dark:bg-[#111315] dark:text-neutral-100"
+    >
       <main className="mx-auto w-full max-w-[100rem] px-5 pb-20 pt-10 sm:px-8 sm:pt-12 md:px-12 md:pt-14 lg:px-16 lg:pt-16 2xl:max-w-[min(133.33rem,calc(100vw-2.5rem))]">
-        <nav
-          className="flex flex-wrap gap-x-5 gap-y-3 border-b border-neutral-200 pb-8 md:gap-x-7 md:pb-10"
-          aria-label="프로젝트 필터"
-        >
-          {SHOWCASE_TABS.map((tab) => {
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`text-[15px] transition-colors md:text-base ${
-                  active
-                    ? "font-bold text-neutral-900"
-                    : "font-normal text-neutral-500 hover:text-neutral-800"
-                }`}
-              >
-                #{tab.label}
-              </button>
-            );
-          })}
-        </nav>
+        <div className="flex items-start justify-between gap-3 border-b border-neutral-200 pb-8 dark:border-neutral-700 md:pb-10">
+          <nav
+            className="flex flex-wrap gap-x-5 gap-y-3 md:gap-x-7"
+            aria-label="프로젝트 필터"
+          >
+            {SHOWCASE_TABS.map((tab) => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`text-[15px] transition-colors md:text-base ${
+                    active
+                      ? "font-bold text-neutral-900 dark:text-neutral-100"
+                      : "font-normal text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  }`}
+                >
+                  #{tab.label}
+                </button>
+              );
+            })}
+          </nav>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={theme === "dark"}
+            onClick={toggleTheme}
+            className="mt-[1px] inline-flex shrink-0 items-center rounded-full transition-colors"
+            aria-label={theme === "light" ? "다크모드로 전환" : "라이트모드로 전환"}
+          >
+            <span
+              aria-hidden
+              className={`relative inline-flex h-6 w-11 items-center rounded-full border px-1 transition-colors ${
+                theme === "dark"
+                  ? "justify-start border-neutral-500 bg-neutral-700"
+                  : "justify-end border-neutral-300 bg-neutral-200"
+              }`}
+            >
+              <span className="text-[11px] leading-none">
+                {theme === "light" ? "☀️" : "🌙"}
+              </span>
+            </span>
+          </button>
+        </div>
 
         <div className="pt-10 md:pt-12 lg:pt-14">
           {filtered.length === 0 ? (
-            <p className="py-16 text-center text-[15px] text-neutral-500">
+            <p className="py-16 text-center text-[15px] text-neutral-500 dark:text-neutral-400">
               이 탭에 해당하는 프로젝트가 없습니다.
             </p>
           ) : (
@@ -157,7 +205,7 @@ export function NewShowcaseClient() {
         </div>
 
         <p
-          className="mt-12 max-w-prose border-l-2 border-neutral-200 pl-3.5 text-[12px] leading-snug text-neutral-400 md:mt-14 md:text-[13px]"
+          className="mt-12 max-w-prose border-l-2 border-neutral-200 pl-3.5 text-[12px] leading-snug text-neutral-400 dark:border-neutral-700 dark:text-neutral-500 md:mt-14 md:text-[13px]"
           role="note"
         >
           기여도 100%에 가까운 프로젝트만 선별된 포트폴리오 입니다.
@@ -243,9 +291,9 @@ function ProjectCard({
     <button
       type="button"
       onClick={onOpen}
-      className="group flex h-full w-full flex-col bg-white text-left focus-visible:outline focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
+      className="group flex h-full w-full flex-col bg-white text-left focus-visible:outline focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 dark:bg-transparent dark:focus-visible:ring-neutral-200"
     >
-      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-neutral-100">
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-neutral-100 dark:bg-neutral-800">
         <ShowcaseProjectImage
           src={p.image}
           alt=""
@@ -256,12 +304,12 @@ function ProjectCard({
       </div>
       <div className="flex flex-1 flex-col pt-4 sm:pt-5 md:pt-5">
         {category ? (
-          <p className="text-[15px] font-semibold leading-snug tracking-tight text-neutral-900 md:text-base">
+          <p className="text-[15px] font-semibold leading-snug tracking-tight text-neutral-900 dark:text-neutral-100 md:text-base">
             {category}
           </p>
         ) : null}
         <h2
-          className={`text-lg font-bold leading-snug tracking-tight text-neutral-900 md:text-xl ${
+          className={`text-lg font-bold leading-snug tracking-tight text-neutral-900 dark:text-neutral-100 md:text-xl ${
             category ? "mt-1" : ""
           }`}
         >
@@ -272,7 +320,7 @@ function ProjectCard({
             {chips.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center rounded bg-neutral-100 px-2.5 py-1 text-[13px] font-medium leading-none text-neutral-700 md:px-3 md:py-1.5 md:text-sm"
+                className="inline-flex items-center rounded bg-neutral-100 px-2.5 py-1 text-[13px] font-medium leading-none text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 md:px-3 md:py-1.5 md:text-sm"
               >
                 #{tag.replace(/^#/, "").trim()}
               </span>
@@ -538,12 +586,12 @@ function ProjectDetailModal({
       <button
         type="button"
         onClick={onClose}
-        className="absolute inset-0 bg-neutral-900/40 backdrop-blur-[2px] transition-colors hover:bg-neutral-900/50"
+        className="absolute inset-0 bg-neutral-900/50 backdrop-blur-[2px] transition-colors hover:bg-neutral-900/60"
         aria-label="닫기"
       />
 
       <div
-        className="relative z-10 flex h-[min(90dvh,calc(100dvh-2rem))] max-h-[min(90dvh,calc(100dvh-2rem))] w-full max-w-[min(100rem,calc(100vw-2rem))] flex-col overflow-hidden bg-white shadow-2xl ring-1 ring-black/[0.06]"
+        className="relative z-10 flex h-[min(90dvh,calc(100dvh-2rem))] max-h-[min(90dvh,calc(100dvh-2rem))] w-full max-w-[min(100rem,calc(100vw-2rem))] flex-col overflow-hidden bg-white shadow-2xl ring-1 ring-black/[0.06] dark:bg-[#191b1f] dark:ring-white/10"
         role="dialog"
         aria-modal="true"
         aria-labelledby="project-detail-title"
@@ -552,7 +600,7 @@ function ProjectDetailModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center bg-white/95 text-neutral-700 shadow-sm ring-1 ring-black/5 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+          className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center bg-white/95 text-neutral-700 shadow-sm ring-1 ring-black/5 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:bg-neutral-900/95 dark:text-neutral-300 dark:ring-white/10 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
           aria-label="닫기"
         >
           <svg
@@ -569,7 +617,7 @@ function ProjectDetailModal({
         </button>
 
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-          <div className="relative h-[38vh] min-h-[200px] w-full shrink-0 bg-neutral-100 md:h-full md:w-1/2 md:flex-none md:min-h-[min(45vh,420px)]">
+          <div className="relative h-[38vh] min-h-[200px] w-full shrink-0 bg-neutral-100 dark:bg-neutral-900 md:h-full md:w-1/2 md:flex-none md:min-h-[min(45vh,420px)]">
             <DetailImageCarousel
               slides={gallerySlides}
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -577,10 +625,10 @@ function ProjectDetailModal({
           </div>
 
           <div className="flex min-h-0 w-full flex-1 flex-col md:w-1/2 md:min-w-0">
-            <div className="shrink-0 border-b border-neutral-100 px-5 pb-4 pt-4 pr-14 sm:px-8 sm:pb-5 sm:pt-5 md:px-10 md:pb-5 md:pt-6 lg:px-12">
+            <div className="shrink-0 border-b border-neutral-100 dark:border-neutral-700 px-5 pb-4 pt-4 pr-14 sm:px-8 sm:pb-5 sm:pt-5 md:px-10 md:pb-5 md:pt-6 lg:px-12">
               <h2
                 id="project-detail-title"
-                className="text-xl font-bold leading-snug tracking-tight text-neutral-900 sm:text-2xl"
+                className="text-xl font-bold leading-snug tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl"
               >
                 {project.name}
               </h2>
@@ -598,7 +646,7 @@ function ProjectDetailModal({
             >
               <div className="mx-auto w-full max-w-3xl px-5 py-5 sm:px-8 sm:py-6 md:max-w-none md:px-10 md:py-8 lg:px-12">
                 {paragraphs.length > 0 ? (
-                  <div className="space-y-4 text-[13px] leading-[1.7] text-neutral-700 sm:text-[14px]">
+                  <div className="space-y-4 text-[13px] leading-[1.7] text-neutral-700 dark:text-neutral-300 sm:text-[14px]">
                     {paragraphs.map((para, i) => (
                       <p key={i} className="whitespace-pre-line">
                         {para}
@@ -606,7 +654,7 @@ function ProjectDetailModal({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[15px] text-neutral-500 sm:text-base">
+                  <p className="text-[15px] text-neutral-500 dark:text-neutral-400 sm:text-base">
                     등록된 상세 본문이 없습니다.
                   </p>
                 )}
@@ -614,7 +662,7 @@ function ProjectDetailModal({
             </div>
 
             <nav
-              className="shrink-0 border-t border-neutral-200 bg-white px-5 py-4 sm:px-8 md:px-10 lg:px-12"
+              className="shrink-0 border-t border-neutral-200 bg-white px-5 py-4 dark:border-neutral-700 dark:bg-[#191b1f] sm:px-8 md:px-10 lg:px-12"
               aria-label="프로젝트 이전·다음"
             >
               <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 md:max-w-none">
@@ -625,9 +673,9 @@ function ProjectDetailModal({
                     if (!canPrev || detailIndex <= 0) return;
                     onNavigateProject(navigableProjects[detailIndex - 1]!);
                   }}
-                  className="-ml-2 inline-flex min-w-[5rem] items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 disabled:text-neutral-300 disabled:hover:bg-white sm:-ml-4 md:-ml-6 lg:-ml-8"
+                  className="-ml-2 inline-flex min-w-[5rem] items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 disabled:text-neutral-300 disabled:hover:bg-white dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:disabled:text-neutral-600 dark:disabled:hover:bg-neutral-900 sm:-ml-4 md:-ml-6 lg:-ml-8"
                 >
-                  <span aria-hidden className="mr-1.5 text-neutral-500">
+                  <span aria-hidden className="mr-1.5 text-neutral-500 dark:text-neutral-400">
                     ‹
                   </span>
                   이전
@@ -641,10 +689,10 @@ function ProjectDetailModal({
                       navigableProjects[detailIndex + 1]!
                     );
                   }}
-                  className="-mr-2 inline-flex min-w-[5rem] items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 disabled:text-neutral-300 disabled:hover:bg-white sm:-mr-4 md:-mr-6 lg:-mr-8"
+                  className="-mr-2 inline-flex min-w-[5rem] items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 disabled:text-neutral-300 disabled:hover:bg-white dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:disabled:text-neutral-600 dark:disabled:hover:bg-neutral-900 sm:-mr-4 md:-mr-6 lg:-mr-8"
                 >
                   다음
-                  <span aria-hidden className="ml-1.5 text-neutral-500">
+                  <span aria-hidden className="ml-1.5 text-neutral-500 dark:text-neutral-400">
                     ›
                   </span>
                 </button>

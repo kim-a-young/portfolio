@@ -9,6 +9,8 @@ interface KeywordPillsProps {
   compact?: boolean;
   /** 지정 시 compact/text-sm 분기 대신 고정 크기 (쇼케이스 본문 통일용) */
   pillTextClassName?: string;
+  /** 다크 분기와 무관하게 라이트 톤 강제 */
+  forceLightTheme?: boolean;
 }
 
 export function KeywordPills({
@@ -16,6 +18,7 @@ export function KeywordPills({
   disabled = false,
   compact = false,
   pillTextClassName,
+  forceLightTheme = false,
 }: KeywordPillsProps) {
   const pillText =
     pillTextClassName ?? (compact ? "text-[14px]" : "text-sm");
@@ -28,11 +31,15 @@ export function KeywordPills({
           type="button"
           onClick={() => onSelect(id, `${emoji} ${label}`)}
           disabled={disabled}
-          className={`rounded-full px-4 py-2.5 ${pillText} font-medium transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50`}
+          className={`rounded-full px-4 py-2.5 ${pillText} font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 ${
+            forceLightTheme ? "" : "hover:opacity-90"
+          }`}
           style={{
-            backgroundColor: "var(--pill-bg)",
-            color: "var(--text-primary)",
-            border: "1px solid var(--border)",
+            backgroundColor: forceLightTheme ? "#EFEFF1" : "var(--pill-bg)",
+            color: forceLightTheme ? "#0F111D" : "var(--text-primary)",
+            border: forceLightTheme
+              ? "1px solid #E5E7EB"
+              : "1px solid var(--border)",
           }}
           aria-label={`${label} 관련 질문하기`}
         >

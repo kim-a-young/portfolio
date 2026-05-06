@@ -38,6 +38,8 @@ interface ChatMessageProps {
   onAssistantStreamComplete?: () => void;
   /** 신규 페이지 도킹 채팅 등: 본문·버튼 폰트 1px 축소 */
   compactUI?: boolean;
+  /** dark 변형을 무시하고 라이트 스타일을 강제 */
+  forceLightTheme?: boolean;
 }
 
 export function ChatMessage({
@@ -48,6 +50,7 @@ export function ChatMessage({
   isTyping = false,
   isStreaming = false,
   compactUI = false,
+  forceLightTheme = false,
   interviewerQuestions,
   showInterviewerPrompt = false,
   isLoadingQuestions = false,
@@ -209,6 +212,16 @@ export function ChatMessage({
   const compactMarkdownUniform =
     "[&_h1]:!text-[14px] [&_h2]:!text-[14px] [&_h3]:!text-[14px] [&_code]:!text-[14px]";
 
+  const userBubbleThemeClass = forceLightTheme
+    ? "bg-[#0F111D] text-white"
+    : "bg-[#0F111D] text-white dark:bg-white dark:text-[#0F0F10]";
+  const userMarkdownClass = forceLightTheme
+    ? "[&_p]:mb-2 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_li]:my-0.5 [&_a]:text-blue-200 [&_a]:underline [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1"
+    : markdownProseUser;
+  const promptBgColor = forceLightTheme ? "#E5E7EB" : "var(--border)";
+  const promptTextColor = forceLightTheme ? "#0F111D" : "var(--text-primary)";
+  const promptBorderColor = forceLightTheme ? "#E5E7EB" : "var(--border)";
+
   return (
     <div
       className={`flex w-full flex-col gap-2 ${isUser ? "items-end" : "items-start"}`}
@@ -218,7 +231,7 @@ export function ChatMessage({
       {isUser ? (
         <>
           <div
-            className={`max-w-[85%] rounded-2xl px-4 py-3 ${bodySize} leading-relaxed bg-[#0F111D] text-white dark:bg-white dark:text-[#0F0F10] ${markdownProseUser} ${compactFont ? compactMarkdownUniform : ""}`}
+            className={`max-w-[85%] rounded-2xl px-4 py-3 ${bodySize} leading-relaxed ${userBubbleThemeClass} ${userMarkdownClass} ${compactFont ? compactMarkdownUniform : ""}`}
           >
             <ReactMarkdown remarkPlugins={[remarkBreaks]}>
               {displayedContent}
@@ -259,9 +272,9 @@ export function ChatMessage({
                   disabled={isLoadingQuestions}
                   className={`flex items-center justify-between rounded-2xl px-4 py-2 ${btnSize} max-w-[85%] transition-colors border`}
                   style={{
-                    backgroundColor: "var(--border)",
-                    color: "var(--text-primary)",
-                    borderColor: "var(--border)",
+                    backgroundColor: promptBgColor,
+                    color: promptTextColor,
+                    borderColor: promptBorderColor,
                     opacity: isLoadingQuestions ? 0.6 : 1,
                   }}
                   onMouseEnter={(e) => {
@@ -273,7 +286,7 @@ export function ChatMessage({
                     e.currentTarget.style.opacity = isLoadingQuestions ? "0.6" : "1";
                   }}
                 >
-                  <span style={{ color: "var(--text-primary)" }}>{isLoadingQuestions ? "생성 중..." : "음...그..."}</span>
+                  <span style={{ color: promptTextColor }}>{isLoadingQuestions ? "생성 중..." : "음...그..."}</span>
                   {interviewerQuestions && interviewerQuestions.length > 0 && (
                     <svg
                       className={`ml-2 transition-transform ${isPromptExpanded ? "rotate-180" : ""}`}
@@ -283,7 +296,7 @@ export function ChatMessage({
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
-                      style={{ color: "var(--text-primary)" }}
+                      style={{ color: promptTextColor }}
                     >
                       <path d="M6 9l6 6 6-6" />
                     </svg>
@@ -298,9 +311,9 @@ export function ChatMessage({
                       onClick={() => onQuestionClick?.(question)}
                       className={`rounded-2xl px-4 py-2 ${btnSize} max-w-[85%] text-right transition-colors border`}
                       style={{
-                        backgroundColor: "var(--border)",
-                        color: "var(--text-primary)",
-                        borderColor: "var(--border)",
+                        backgroundColor: promptBgColor,
+                        color: promptTextColor,
+                        borderColor: promptBorderColor,
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.opacity = "0.9";
@@ -309,7 +322,7 @@ export function ChatMessage({
                         e.currentTarget.style.opacity = "1";
                       }}
                     >
-                      <span style={{ color: "var(--text-primary)" }}>{question}</span>
+                      <span style={{ color: promptTextColor }}>{question}</span>
                     </button>
                   ))}
                 </>

@@ -67,7 +67,7 @@ export function ProjectDetailToolsRow({
 
   if (!m || !body) {
     return (
-      <p className="mt-2 text-sm text-neutral-500 sm:text-[15px]">{trimmed}</p>
+      <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 sm:text-[15px]">{trimmed}</p>
     );
   }
 
@@ -83,7 +83,7 @@ export function ProjectDetailToolsRow({
 
   return (
     <div
-      className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-sm text-neutral-600 sm:text-[15px]"
+      className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-sm text-neutral-600 dark:text-neutral-300 sm:text-[15px]"
       role="group"
       aria-label="사용 도구"
     >
@@ -102,7 +102,7 @@ export function ProjectDetailToolsRow({
               decoding="async"
             />
           ) : (
-            <span className="text-neutral-500">{tool.label}</span>
+            <span className="text-neutral-500 dark:text-neutral-400">{tool.label}</span>
           )}
         </span>
       ))}
