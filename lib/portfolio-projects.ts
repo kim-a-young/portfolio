@@ -49,6 +49,29 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
     ],
   },
   {
+    id: 25,
+    name: "SKT 해피해빗 백오피스 구축",
+    url: "#",
+    image: "/images/habitadmin_thum.png",
+    accent: "#c2410c",
+    meta: "백오피스",
+    detailImage: "/images/habitadmin_thum.png",
+    detailImages: [
+      "/images/habitadmin_thum.png",
+      "/images/habitadmin_detail1.png",
+      "/images/habitadmin_detail2.png",
+    ],
+    detailDesignTypes: "Web, Mobile, UI/UX, Admin, Data Table UX",
+    detailTools: "Tool : Figma, XD, Photoshop, Illustrator",
+    detailDescription: `친환경 서비스 ‘해피해빗’ 운영을 지원하는 백오피스 구축 프로젝트에서 UI·화면 설계를 담당하였습니다.
+
+캠페인·매장·반납·이력 등 운영 데이터를 효율적으로 관리할 수 있도록 정보 구조와 업무 흐름을 정리하고, 본부·현장이 동일한 기준으로 확인·처리할 수 있는 관리 화면을 설계하였습니다.
+
+대량의 목록·상태·이력을 다루는 화면에서는 검색·필터·일괄 처리 등 조작 효율을 우선하고, 예외 상황이 직관적으로 드러나도록 UI를 구성하였습니다.
+
+해피해빗 서비스와 시각적 연속성을 유지하면서도, 운영 도구로서의 가독성과 신뢰감을 갖추도록 디자인하였습니다.`,
+  },
+  {
     id: 21,
     name: "다중 비행장 원격 통합 관제 시스템 구조 시각화",
     url: "#",
@@ -416,7 +439,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
  * 카드 번호 02·04·06에 해당하던 항목(id 21, 22, 20)은 /v2 이후 추가 분위기로 메인에서 제외.
  */
 const MAIN_MENU_PROJECT_ORDER: number[] = [
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 24, 11, 13, 15, 12, 14, 16, 17, 18, 19,
+  1, 25, 2, 3, 4, 5, 6, 7, 8, 9, 10, 24, 11, 13, 15, 12, 14, 16, 17, 18, 19,
 ];
 
 /**

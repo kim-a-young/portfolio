@@ -51,6 +51,15 @@ const YJU_GALLERY_IMAGES = [
   `/images/yju_detail1.png?v=${YJU_ASSET_VER}`,
 ] as const;
 
+/** 해피해빗 백오피스 썸네일·상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const HABITADMIN_ASSET_VER = "1";
+const HABITADMIN_THUM = `/images/habitadmin_thum.png?v=${HABITADMIN_ASSET_VER}`;
+const HABITADMIN_GALLERY_IMAGES = [
+  HABITADMIN_THUM,
+  `/images/habitadmin_detail1.png?v=${HABITADMIN_ASSET_VER}`,
+  `/images/habitadmin_detail2.png?v=${HABITADMIN_ASSET_VER}`,
+] as const;
+
 /** LG SIS 썸네일·상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
 const LGSIS_ASSET_VER = "1";
 const LGSIS_THUM = `/images/lgsis_thum.png?v=${LGSIS_ASSET_VER}`;
@@ -74,7 +83,7 @@ const HEYPOLL_GALLERY_IMAGES = [
 ] as const;
 
 /** /v2 그리드 상단 노출 순서 (해피해빗 → 항공포털 → 레드커넥트 → MONOPLEX → SK Tech 아카데미). */
-const V2_LEADING_PROJECT_IDS: readonly number[] = [2, 1, 3, 20, 23];
+const V2_LEADING_PROJECT_IDS: readonly number[] = [2, 1, 25, 3, 20, 23];
 
 /**
  * /v2 쇼케이스 탭 전용 프로젝트 목록.
@@ -86,6 +95,13 @@ const NEW_SHOWCASE_PROJECTS_MAPPED: ProjectItem[] = SHOWCASE_PROJECTS.map((p) =>
       ...p,
       image: AIRPORTAL_IMAGES[0],
       detailImages: [...AIRPORTAL_IMAGES],
+    };
+  }
+  if (p.id === 25) {
+    return {
+      ...p,
+      image: HABITADMIN_THUM,
+      detailImages: [...HABITADMIN_GALLERY_IMAGES],
     };
   }
   if (p.id === 2) {
