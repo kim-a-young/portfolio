@@ -31,6 +31,27 @@ const HERZION_DETAIL_PARAGRAPHS = [
 /** /v2 쇼케이스용 최신 카피·순서·이미지 */
 export const SHOWCASE_PROJECTS: ProjectItem[] = [
   {
+    id: 26,
+    name: "KB전자문서 통합발송시스템 구축",
+    url: "#",
+    image: "/images/kbsystem_thum.png",
+    accent: "#f59e0b", // KB 옐로 계열
+    meta: "금융 · 시스템",
+    detailImage: "/images/kbsystem_thum.png",
+    detailImages: [
+      "/images/kbsystem_thum.png",
+      "/images/kbsystem_detail1.png",
+      "/images/kbsystem_detail2.png",
+    ],
+    detailDesignTypes: "UI/UX, DesignSystem",
+    detailTools: "Tool : Figma",
+    detailDescription: `KB 부서별로 흩어져 있던 고객통지문서를 하나로 통합해 공통으로 활용하는 시스템 구축 프로젝트에 디자이너로 참여하여, 서비스 컨셉과 화면 체계를 정의하고 전체 화면을 디자인하였습니다.
+
+여러 부서가 함께 사용하는 시스템인 만큼, KB 전용 서체와 컬러, 아이콘 가이드를 기반으로 UI 요소를 정리하여 화면 전반에서 브랜드 일관성과 신뢰감이 유지되도록 하였습니다.
+
+핵심 기능인 문서 발송에서는 발송 진행 상태를 사용자가 직관적으로 파악할 수 있는 것이 중요했습니다. 이를 위해 상태별 표현 규칙을 별도의 상태 가이드로 체계화하여, 발송 단계와 결과가 한눈에 드러나고 예외 상황도 명확하게 인지할 수 있도록 UI를 구성하였습니다.`,
+  },
+  {
     id: 1,
     name: "항공정보포털 UI/UX 개편",
     url: "#",

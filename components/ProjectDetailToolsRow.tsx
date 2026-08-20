@@ -76,7 +76,7 @@ export function ProjectDetailToolsRow({
     .map((s) => s.trim())
     .filter(Boolean)
     .filter((token) => {
-      if (projectId === 1) return true;
+      if (projectId === 1 || projectId === 26) return true;
       return token.toLowerCase() !== "figma";
     });
   const tools = tokens.map(resolveToolToken);

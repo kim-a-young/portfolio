@@ -82,14 +82,30 @@ const HEYPOLL_GALLERY_IMAGES = [
   `/images/heypoll_detail1.png?v=${HEYPOLL_ASSET_VER}`,
 ] as const;
 
-/** /v2 그리드 상단 노출 순서 (해피해빗 → 항공포털 → 레드커넥트 → MONOPLEX → SK Tech 아카데미). */
-const V2_LEADING_PROJECT_IDS: readonly number[] = [2, 1, 25, 3, 20, 23];
+/** KB전자문서 통합발송시스템 썸네일·상세 PNG 교체 시 버전 숫자만 올리면 캐시가 갱신됩니다. */
+const KBSYSTEM_ASSET_VER = "2";
+const KBSYSTEM_THUM = `/images/kbsystem_thum.png?v=${KBSYSTEM_ASSET_VER}`;
+const KBSYSTEM_GALLERY_IMAGES = [
+  KBSYSTEM_THUM,
+  `/images/kbsystem_detail1.png?v=${KBSYSTEM_ASSET_VER}`,
+  `/images/kbsystem_detail2.png?v=${KBSYSTEM_ASSET_VER}`,
+] as const;
+
+/** /v2 그리드 상단 노출 순서 (KB전자문서 → 해피해빗 → 항공포털 → 레드커넥트 → MONOPLEX → SK Tech 아카데미). */
+const V2_LEADING_PROJECT_IDS: readonly number[] = [26, 2, 1, 25, 3, 20, 23];
 
 /**
  * /v2 쇼케이스 탭 전용 프로젝트 목록.
  * `SHOWCASE_PROJECTS`와 이미지·상세 갤러리 경로를 분리해 관리합니다.
  */
 const NEW_SHOWCASE_PROJECTS_MAPPED: ProjectItem[] = SHOWCASE_PROJECTS.map((p) => {
+  if (p.id === 26) {
+    return {
+      ...p,
+      image: KBSYSTEM_THUM,
+      detailImages: [...KBSYSTEM_GALLERY_IMAGES],
+    };
+  }
   if (p.id === 1) {
     return {
       ...p,
