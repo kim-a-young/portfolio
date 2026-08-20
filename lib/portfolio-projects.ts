@@ -43,7 +43,7 @@ export const SHOWCASE_PROJECTS: ProjectItem[] = [
       "/images/kbsystem_detail1.png",
       "/images/kbsystem_detail2.png",
     ],
-    detailDesignTypes: "UI/UX, DesignSystem",
+    detailDesignTypes: "UI/UX, Design System",
     detailTools: "Tool : Figma",
     detailDescription: `KB 부서별로 흩어져 있던 고객통지문서를 하나로 통합해 공통으로 활용하는 시스템 구축 프로젝트에 디자이너로 참여하여, 서비스 컨셉과 화면 체계를 정의하고 전체 화면을 디자인하였습니다.
 

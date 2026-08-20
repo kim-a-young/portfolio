@@ -424,14 +424,27 @@ function DetailImageCarousel({
   );
 
   const [pauseRoll, setPauseRoll] = useState(false);
+  /** 진입 직후 첫 장 넘김은 더 빠르게(다음 장을 일찍 보여줌), 이후엔 일반 간격 */
+  const [advancedOnce, setAdvancedOnce] = useState(false);
+
+  useEffect(() => {
+    setAdvancedOnce(false);
+  }, [slideSig]);
 
   useEffect(() => {
     if (n <= 1 || pauseRoll) return;
+    if (!advancedOnce) {
+      const t = window.setTimeout(() => {
+        go(1);
+        setAdvancedOnce(true);
+      }, 200);
+      return () => window.clearTimeout(t);
+    }
     const id = window.setInterval(() => {
       go(1);
     }, 5000);
     return () => window.clearInterval(id);
-  }, [n, slideSig, go, pauseRoll]);
+  }, [n, slideSig, go, pauseRoll, advancedOnce]);
 
   if (n === 1) {
     return (
